@@ -1,25 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Navbar from './components/Navbar'
-import Home from './components/Home'
-import SplashScreen from './components/SplashScreen'
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//      <Home/>
-//     </>
-//   )
-// }
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
+import SplashScreen from "./components/SplashScreen";
 
 const MainApp = () => {
   return (
     <>
-      <Home/>
+      <Home />
     </>
   );
 };
@@ -34,4 +24,4 @@ const App = () => {
   );
 };
 
-export default App
+export default App;
