@@ -1,1134 +1,671 @@
-import React, { lazy, Suspense, useMemo, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
-import "../style/Home.css";
-import { Link, animateScroll as scroll } from "react-scroll";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 
-const Navbar = lazy(() => import("./Navbar"));
-const Typewriter = lazy(() => import("typewriter-effect"));
+// Splash Screen Component
+const SplashScreen = ({ onComplete }) => {
+  const [step, setStep] = useState(0);
 
-// Optimized Animation Variants with better performance
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    x: "-100vw",
-    willChange: "transform, opacity",
-  },
-  in: {
-    opacity: 1,
-    x: 0,
-    willChange: "auto",
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 20,
-    },
-  },
-  out: {
-    opacity: 0,
-    x: "100vw",
-    willChange: "transform, opacity",
-  },
-};
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 500),
+      setTimeout(() => setStep(2), 2000),
+      setTimeout(() => setStep(3), 2800),
+      setTimeout(onComplete, 3500),
+    ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      delayChildren: 0.2,
-      staggerChildren: 0.15,
-      ease: "easeOut",
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-    willChange: "transform, opacity",
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    willChange: "auto",
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-const BlogCard = ({ title, excerpt, date, image, category, slug }) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.article
-      className="blog-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full"
-      whileHover={
-        !shouldReduceMotion
-          ? {
-              scale: 1.03,
-              y: -5,
-              boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: {
-                duration: 0.2,
-                ease: "easeOut",
-              },
-            }
-          : {}
-      }
-      layout
-    >
-      <div className="blog-card-image">
-        <img
-          src={image}
-          alt={`Featured image for ${title}`}
-          className="w-full h-48 object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex justify-between items-center mb-2">
-          <span
-            className="text-emerald-600 font-semibold text-sm"
-            aria-label={`Category: ${category}`}
-          >
-            {category}
-          </span>
-          <time className="text-gray-500 text-sm" dateTime={date}>
-            {date}
-          </time>
-        </div>
-        <h3 className="text-xl font-bold mb-2 text-gray-800 flex-grow">
-          {title}
-        </h3>
-        <p className="text-gray-600 mb-4 flex-grow">{excerpt}</p>
-        <button
-          className="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 self-start"
-          aria-label={`Read more about ${title}`}
-        >
-          Read More
-        </button>
-      </div>
-    </motion.article>
-  );
-};
-
-const PortfolioCard = ({
-  title,
-  description,
-  image,
-  technologies,
-  liveLink,
-  githubLink,
-}) => {
-  const shouldReduceMotion = useReducedMotion();
+    return () => timers.forEach(clearTimeout);
+  }, [onComplete]);
 
   return (
     <motion.div
-      className="portfolio-card bg-white rounded-lg shadow-lg overflow-hidden"
-      whileHover={
-        !shouldReduceMotion
-          ? {
-              y: -8,
-              scale: 1.02,
-              transition: { duration: 0.2 },
-            }
-          : {}
-      }
-      layout
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 overflow-hidden"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
+      transition={{ duration: 0.6 }}
     >
-      <div className="relative overflow-hidden">
-        <img
-          src={image}
-          alt={`Screenshot of ${title} project`}
-          className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="text-center">
-            {liveLink && (
-              <a
-                href={liveLink}
-                className="bg-emerald-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-emerald-600 transition duration-200"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View live demo of ${title}`}
-              >
-                Live Demo
-              </a>
-            )}
-            {githubLink && (
-              <a
-                href={githubLink}
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition duration-200"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View source code of ${title} on GitHub`}
-              >
-                Source Code
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 text-gray-800">{title}</h3>
-        <p className="text-gray-600 mb-4">{description}</p>
-        <div className="flex flex-wrap gap-2">
-          {technologies?.map((tech, index) => (
-            <span
-              key={index}
-              className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
+      <motion.div
+        className="absolute w-96 h-96 rounded-full bg-white/10 blur-3xl"
+        animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, -50, 0] }}
+        transition={{ duration: 4, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute w-64 h-64 rounded-full bg-blue-400/20 blur-2xl"
+        animate={{ scale: [1, 1.3, 1], x: [0, -50, 0], y: [0, 50, 0] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+
+      <motion.div className="relative text-center px-4">
+        <motion.h1
+          className="text-5xl sm:text-7xl md:text-8xl font-bold text-white"
+          initial={{ opacity: 0, letterSpacing: "0.5em" }}
+          animate={step >= 1 ? { opacity: 1, letterSpacing: "0em" } : {}}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          Celsystech
+        </motion.h1>
+
+        <motion.p
+          className="text-lg sm:text-xl text-white/90 mt-4 font-light"
+          initial={{ opacity: 0, y: 20 }}
+          animate={step >= 2 ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          Crafting Digital Excellence
+        </motion.p>
+
+        <motion.div
+          className="mt-8 h-1 bg-white/30 rounded-full overflow-hidden mx-auto max-w-xs"
+          initial={{ opacity: 0 }}
+          animate={step >= 2 ? { opacity: 1 } : {}}
+        >
+          <motion.div
+            className="h-full bg-white rounded-full"
+            initial={{ width: "0%" }}
+            animate={step >= 2 ? { width: "100%" } : {}}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          />
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 };
 
-const Home = () => {
-  const { scrollYProgress } = useScroll();
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const shouldReduceMotion = useReducedMotion();
+// Floating Element Component
+const FloatingElement = ({ children, delay = 0, duration = 3 }) => (
+  <motion.div
+    animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
+    transition={{ duration, delay, repeat: Infinity, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
+// Enhanced Navbar
+const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-    return () => {
-      document.documentElement.style.scrollBehavior = "auto";
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const blogPosts = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "The Future of Web Development in 2024",
-        excerpt:
-          "Dive deep into the emerging trends transforming web development, from AI-powered design to advanced performance optimization techniques.",
-        date: "2024-01-15",
-        image:
-          "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
-        category: "Web Technology",
-        slug: "future-of-web-development-2024",
-      },
-      {
-        id: 2,
-        title: "AI and Machine Learning: Transforming Business Solutions",
-        excerpt:
-          "Explore how artificial intelligence is revolutionizing business strategies, from predictive analytics to intelligent automation and decision-making.",
-        date: "2024-02-03",
-        image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-        category: "Artificial Intelligence",
-        slug: "ai-ml-transforming-business-solutions",
-      },
-      {
-        id: 3,
-        title: "Blockchain: Beyond Cryptocurrency Innovations",
-        excerpt:
-          "Uncover the transformative potential of blockchain technology across industries, from supply chain management to secure digital identities.",
-        date: "2024-03-20",
-        image:
-          "https://online.stanford.edu/sites/default/files/inline-images/1600X900-How-does-blockchain-work.jpg",
-        category: "Blockchain Technology",
-        slug: "blockchain-beyond-cryptocurrency",
-      },
-    ],
-    []
-  );
+  return (
+    <motion.nav
+      className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-transparent"
+      }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+    >
+      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-20">
+        <motion.div
+          className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent"
+          whileHover={{ scale: 1.05 }}
+        >
+          Celsystech
+        </motion.div>
 
-  const portfolioProjects = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "E-Commerce Platform",
-        description:
-          "A modern, responsive e-commerce platform with advanced features like real-time inventory management, secure payment processing, and AI-powered product recommendations.",
-        image:
-          "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 2,
-        title: "Healthcare Management System",
-        description:
-          "Comprehensive healthcare management system with patient records, appointment scheduling, telemedicine capabilities, and HIPAA compliance.",
-        image:
-          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["React Native", "Firebase", "Express.js", "PostgreSQL"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 3,
-        title: "FinTech Mobile App",
-        description:
-          "Secure mobile banking application with biometric authentication, real-time transactions, budget tracking, and investment portfolio management.",
-        image:
-          "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Flutter", "Django", "Redis", "AWS"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 4,
-        title: "AI-Powered Analytics Dashboard",
-        description:
-          "Business intelligence dashboard with machine learning insights, predictive analytics, and interactive data visualization for enterprise clients.",
-        image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Vue.js", "Python", "TensorFlow", "D3.js"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 5,
-        title: "Blockchain Supply Chain",
-        description:
-          "Transparent supply chain management system using blockchain technology for product authentication, traceability, and smart contracts.",
-        image:
-          "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Solidity", "Web3.js", "React", "IPFS"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 6,
-        title: "EdTech Learning Platform",
-        description:
-          "Interactive online learning platform with video streaming, progress tracking, gamification elements, and collaborative tools for educators.",
-        image:
-          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Next.js", "GraphQL", "Socket.io", "MySQL"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-    ],
-    []
+        <div className="hidden md:flex space-x-8">
+          {["Home", "About", "Services", "Blog", "Contact"].map((item, idx) => (
+            <motion.a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="text-gray-700 hover:text-emerald-600 font-medium relative group"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * idx }}
+            >
+              {item}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-600 group-hover:w-full transition-all duration-300" />
+            </motion.a>
+          ))}
+        </div>
+
+        <motion.button
+          className="hidden md:block bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-2.5 rounded-full shadow-lg"
+          whileHover={{
+            scale: 1.05,
+            boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)",
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Get a Quote
+        </motion.button>
+
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-gray-800"
+        >
+          <svg
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            {isMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            className="md:hidden bg-white/95 backdrop-blur-md shadow-lg"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+          >
+            <div className="flex flex-col items-center space-y-4 py-6">
+              {["Home", "About", "Services", "Blog", "Contact"].map((item) => (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="text-gray-800 hover:text-emerald-600"
+                >
+                  {item}
+                </a>
+              ))}
+              <button className="bg-emerald-600 text-white px-6 py-2 rounded-full">
+                Get Quote
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
+};
+
+// Main App Component
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   return (
     <>
-      {/* <Helmet>
-        <title>
-          Innovative Tech - Cutting Edge Technological Solutions | Web
-          Development, Mobile Apps & Blockchain
-        </title>
-        <meta
-          name="description"
-          content="Transform your business with advanced tech solutions. Specializing in web development, mobile apps, blockchain technology, and digital innovation. Get a quote today!"
-        />
-        <meta
-          name="keywords"
-          content="web development, mobile app development, blockchain, digital marketing, UI/UX design, software development, technology solutions"
-        />
-        <meta name="author" content="Innovative Tech" />
-        <meta
-          property="og:title"
-          content="Innovative Tech - Cutting Edge Technological Solutions"
-        />
-        <meta
-          property="og:description"
-          content="Transform your business with advanced tech solutions. Specializing in web development, mobile apps, blockchain technology."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourwebsite.com" />
-        <meta
-          property="og:image"
-          content="https://yourwebsite.com/og-image.jpg"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href="https://yourwebsite.com" />
-      </Helmet> */}
-
       <motion.div
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={{ duration: 0.5 }}
-      >
-        <Suspense
-          fallback={
-            <motion.div
-              className="flex items-center justify-center min-h-screen"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="text-2xl font-semibold text-emerald-600">
-                Loading...
-              </div>
-            </motion.div>
-          }
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-blue-500 origin-left z-50"
+        style={{ scaleX }}
+      />
+
+      <AnimatePresence>
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      </AnimatePresence>
+
+      {!showSplash && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
           <Navbar />
-          <motion.main
-            className="masterdiv"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+
+          {/* Hero Section */}
+          <section
+            id="home"
+            className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-gray-50 to-white pt-20"
           >
-            {/* Hero Section */}
-            <motion.section
-              id="home"
-              className="min-h-screen bg-white p-8 sm:p-30 flex items-center"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="container mx-auto">
-                <div className="grid grid-cols-12 gap-8 items-center">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <FloatingElement delay={0} duration={4}>
+                <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-200/30 rounded-full blur-3xl" />
+              </FloatingElement>
+              <FloatingElement delay={1} duration={5}>
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl" />
+              </FloatingElement>
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
                   <motion.div
-                    className="col-span-12 lg:col-span-6"
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    viewport={{ once: true }}
+                    className="inline-block mb-4"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <header>
-                      <h1 className="sm:text-6xl text-4xl main-heading typewriter mb-4">
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.5, duration: 0.5 }}
-                        >
-                          <Suspense fallback={<span>CUTTING EDGE</span>}>
-                            <Typewriter
-                              options={{
-                                strings: [
-                                  "CUTTING EDGE",
-                                  "ADVANCE",
-                                  "INNOVATIVE",
-                                ],
-                                autoStart: true,
-                                loop: true,
-                                deleteSpeed: 50,
-                                delay: 100,
-                              }}
-                            />
-                          </Suspense>
-                        </motion.span>
-                      </h1>
+                    <span className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                      ✨ Welcome to Innovation
+                    </span>
+                  </motion.div>
 
-                      <motion.h2
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        className="sm:text-6xl text-4xl main-heading mb-8"
-                        viewport={{ once: true }}
-                      >
-                        TECHNOLOGICAL SOLUTIONS
-                      </motion.h2>
-                    </header>
+                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                    <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                      CUTTING EDGE
+                    </span>
+                    <br />
+                    <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                      TECHNOLOGICAL
+                    </span>
+                    <br />
+                    <span className="text-gray-900">SOLUTIONS</span>
+                  </h1>
 
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      className="text-justify text-lg text-gray-800 mb-8 leading-relaxed"
-                      viewport={{ once: true }}
-                    >
-                      At Innovative Tech, we transform ideas into impactful
-                      digital solutions. Specializing in website and app
-                      development, project management, and blockchain
-                      technology, we empower businesses to grow through
-                      technology. Our team is dedicated to delivering tailored
-                      solutions that meet your unique needs with creativity,
-                      precision, and expertise. Let's build something
-                      extraordinary together!
-                    </motion.p>
+                  <p className="text-lg text-gray-600 mb-8 leading-relaxed max-w-xl">
+                    At Innovative Tech, we transform ideas into impactful
+                    digital solutions. Specializing in website and app
+                    development, project management, and blockchain technology.
+                  </p>
 
+                  <div className="flex flex-wrap gap-4">
                     <motion.button
-                      whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                      whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                      className="bg-emerald-500 text-white px-8 py-3 transition-all duration-200 ease-in-out transform rounded-lg shadow"
+                      className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full font-semibold shadow-lg"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      Get a Quote
+                      Get Started
                     </motion.button>
-                  </motion.div>
-                  <motion.div
-                    className="col-span-12 lg:col-span-6 flex justify-center"
-                    initial={{ opacity: 0, x: 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    viewport={{ once: true }}
-                  >
-                    <motion.img
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      className="max-w-full h-auto"
-                      src="https://img.freepik.com/free-vector/man-playing-online-games-concept_52683-37362.jpg"
-                      alt="Professional working with cutting-edge technology"
-                      loading="eager"
-                      decoding="async"
-                      viewport={{ once: true }}
-                    />
-                  </motion.div>
-                </div>
+                    <motion.button
+                      className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-full font-semibold hover:border-emerald-500 hover:text-emerald-600 transition-all"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Learn More
+                    </motion.button>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="relative"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <FloatingElement duration={3}>
+                    <div className="relative">
+                      <img
+                        src="https://img.freepik.com/free-vector/man-playing-online-games-concept_52683-37362.jpg"
+                        alt="Professional working with technology"
+                        className="w-full h-auto relative z-10 drop-shadow-2xl"
+                      />
+                      <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-3xl blur-2xl opacity-20" />
+                    </div>
+                  </FloatingElement>
+                </motion.div>
               </div>
-            </motion.section>
+            </div>
 
-            {/* About Section */}
-            <motion.section
-              id="about"
-              className="min-h-screen p-8 sm:p-30 flex items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={containerVariants}
+            <motion.div
+              className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              <div className="container mx-auto">
-                <motion.header variants={itemVariants} className="mb-16">
-                  <h2 className="text-center sm:text-6xl mb-8 font-bold text-4xl">
-                    WHAT DO WE DO?
-                  </h2>
-                </motion.header>
+              <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center pt-2">
+                <motion.div
+                  className="w-1.5 h-3 bg-emerald-500 rounded-full"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              </div>
+            </motion.div>
+          </section>
 
-                <div className="grid grid-cols-12 gap-8 items-center">
+          {/* Stats Section */}
+          <section className="py-20 bg-gradient-to-br from-emerald-500 to-emerald-600 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, white 1px, transparent 1px)",
+                  backgroundSize: "50px 50px",
+                }}
+              />
+            </div>
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
+                {[
+                  { number: "50+", label: "Projects Completed" },
+                  { number: "99%", label: "Client Satisfaction" },
+                  { number: "24/7", label: "Support Available" },
+                ].map((stat, idx) => (
                   <motion.div
-                    className="col-span-12 lg:col-span-6 flex justify-center"
-                    variants={itemVariants}
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.2 }}
+                    className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 hover:bg-white/20 transition-all duration-300"
                   >
-                    <motion.img
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      className="max-w-full h-auto"
-                      src="https://img.freepik.com/free-vector/product-presentation-concept-illustration_114360-8196.jpg"
-                      alt="Business presentation concept"
-                      loading="lazy"
-                      decoding="async"
-                      viewport={{ once: true }}
-                    />
+                    <div className="text-5xl font-bold mb-2">{stat.number}</div>
+                    <div className="text-lg opacity-90">{stat.label}</div>
                   </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
 
-                  <motion.div
-                    className="col-span-12 lg:col-span-6 space-y-12"
-                    variants={containerVariants}
-                  >
-                    {[
-                      {
-                        text: "Transform Your Business with",
-                        highlightText: "Advanced Tech!",
-                        description:
-                          "Our specialists provide the latest solutions to drive your success in the digital world.",
-                      },
-                      {
-                        text: "Harness the Power of",
-                        highlightText: "Smart Technology!",
-                        description:
-                          "Advanced tools designed to streamline operations and sharpen your competitive edge.",
-                      },
-                      {
-                        text: "Unlock New Possibilities with",
-                        highlightText: "Dedicated Team",
-                        description:
-                          "that offers the most advanced tools to enhance your competitive edge in the digital realm.",
-                      },
-                    ].map((item, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.6,
-                          delay: index * 0.2,
-                        }}
-                        className="text-center lg:text-left"
-                        viewport={{ once: true }}
-                      >
-                        <h3 className="sm:text-4xl text-2xl main-heading leading-tight">
-                          {item.text}{" "}
-                          <motion.span
-                            initial={{ backgroundColor: "transparent" }}
-                            whileInView={{
-                              backgroundColor: "#fef08a",
-                              transition: {
-                                duration: 0.5,
-                                delay: index * 0.2 + 0.3,
-                              },
-                            }}
-                            className="bg-yellow-200 inline-block px-2 rounded"
-                          >
-                            {item.highlightText}
-                          </motion.span>{" "}
-                          <span className="block text-lg text-gray-600 mt-2 font-normal">
-                            {item.description}
+          {/* About Section */}
+          <section
+            id="about"
+            className="py-32 bg-white relative overflow-hidden"
+          >
+            <div className="container mx-auto px-4">
+              <motion.div
+                className="text-center mb-16"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-5xl sm:text-6xl font-bold mb-6">
+                  <span className="bg-gradient-to-r from-gray-900 to-emerald-600 bg-clip-text text-transparent">
+                    What Do We Do?
+                  </span>
+                </h2>
+              </motion.div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  <FloatingElement duration={4}>
+                    <img
+                      src="https://img.freepik.com/free-vector/product-presentation-concept-illustration_114360-8196.jpg"
+                      alt="Business presentation"
+                      className="w-full h-auto drop-shadow-2xl"
+                    />
+                  </FloatingElement>
+                </motion.div>
+
+                <div className="space-y-8">
+                  {[
+                    {
+                      title: "Transform Your Business with",
+                      highlight: "Advanced Tech!",
+                      desc: "Our specialists provide the latest solutions to drive your success.",
+                    },
+                    {
+                      title: "Harness the Power of",
+                      highlight: "Smart Technology!",
+                      desc: "Advanced tools designed to streamline operations.",
+                    },
+                    {
+                      title: "Unlock New Possibilities with",
+                      highlight: "Dedicated Team",
+                      desc: "That offers the most advanced tools to enhance your edge.",
+                    },
+                  ].map((item, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.2 }}
+                    >
+                      <div className="bg-gradient-to-r from-gray-50 to-emerald-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300">
+                        <h3 className="text-2xl font-bold mb-3">
+                          {item.title}{" "}
+                          <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                            {item.highlight}
                           </span>
                         </h3>
-                      </motion.div>
-                    ))}
-                  </motion.div>
+                        <p className="text-gray-600">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </motion.section>
+            </div>
+          </section>
 
-            {/* Video Section */}
-            <motion.section
-              id="video"
-              className="min-h-screen p-8 sm:p-30 bg-gray-900 flex items-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="container mx-auto text-center">
-                <motion.header
+          {/* Services Section */}
+          <section
+            id="services"
+            className="py-32 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden"
+          >
+            <div className="container mx-auto px-4">
+              <motion.div
+                className="text-center mb-16"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-5xl sm:text-6xl font-bold mb-6">
+                  <span className="bg-gradient-to-r from-gray-900 to-emerald-600 bg-clip-text text-transparent">
+                    Our Services
+                  </span>
+                </h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Comprehensive solutions tailored to your needs
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[
+                  {
+                    icon: "💻",
+                    name: "Web Development",
+                    desc: "Stunning, high-performance websites",
+                  },
+                  {
+                    icon: "📱",
+                    name: "Mobile Apps",
+                    desc: "Seamless iOS & Android experiences",
+                  },
+                  {
+                    icon: "🎨",
+                    name: "UI/UX Design",
+                    desc: "Beautiful, intuitive interfaces",
+                  },
+                  {
+                    icon: "📈",
+                    name: "Digital Marketing",
+                    desc: "Data-driven growth strategies",
+                  },
+                  {
+                    icon: "🔗",
+                    name: "Blockchain",
+                    desc: "Secure, decentralized solutions",
+                  },
+                  {
+                    icon: "🖌️",
+                    name: "Graphic Design",
+                    desc: "Visual identity & branding",
+                  },
+                ].map((service, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                  >
+                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                      {service.icon}
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                      {service.name}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{service.desc}</p>
+                    <button className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors">
+                      Learn More →
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Blog Section */}
+          <section id="blog" className="py-32 bg-white">
+            <div className="container mx-auto px-4">
+              <motion.div
+                className="text-center mb-16"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-5xl sm:text-6xl font-bold mb-6">
+                  <span className="bg-gradient-to-r from-gray-900 to-emerald-600 bg-clip-text text-transparent">
+                    Latest Insights
+                  </span>
+                </h2>
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[
+                  {
+                    title: "Future of Web Dev",
+                    category: "Technology",
+                    image:
+                      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop",
+                  },
+                  {
+                    title: "AI in Business",
+                    category: "AI/ML",
+                    image:
+                      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop",
+                  },
+                  {
+                    title: "Blockchain Innovations",
+                    category: "Blockchain",
+                    image:
+                      "https://online.stanford.edu/sites/default/files/inline-images/1600X900-How-does-blockchain-work.jpg",
+                  },
+                ].map((post, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    whileHover={{ y: -8 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  >
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-6">
+                      <span className="text-emerald-600 text-sm font-semibold">
+                        {post.category}
+                      </span>
+                      <h3 className="text-xl font-bold mt-2 mb-4">
+                        {post.title}
+                      </h3>
+                      <button className="text-emerald-600 font-semibold hover:text-emerald-700">
+                        Read More →
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Contact Section */}
+          <section
+            id="contact"
+            className="py-32 bg-gradient-to-br from-emerald-500 to-emerald-600 relative overflow-hidden"
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, white 1px, transparent 1px)",
+                  backgroundSize: "50px 50px",
+                }}
+              />
+            </div>
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="max-w-4xl mx-auto text-center">
+                <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="mb-12"
                   viewport={{ once: true }}
                 >
-                  <h2 className="sm:text-6xl text-4xl font-bold text-white mb-4">
-                    SEE OUR WORK IN ACTION
+                  <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+                    Let's Build Something Amazing
                   </h2>
-                  <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Discover how we transform ideas into reality through our
-                    comprehensive development process.
+                  <p className="text-xl text-white/90 mb-12">
+                    Get in touch and let's create the future together
                   </p>
-                </motion.header>
 
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="relative max-w-4xl mx-auto"
-                  viewport={{ once: true }}
-                >
-                  <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-gray-800 flex items-center justify-center">
-                    <p className="text-white text-lg">
-                      Video Player Placeholder
-                    </p>
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-white"
-                    viewport={{ once: true }}
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        50+
-                      </div>
-                      <p className="text-gray-300">Projects Completed</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        99%
-                      </div>
-                      <p className="text-gray-300">Client Satisfaction</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        24/7
-                      </div>
-                      <p className="text-gray-300">Support Available</p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Services Section */}
-            <motion.section
-              id="services"
-              className="min-h-screen p-8 sm:p-30"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl mb-8 font-bold">
-                    WHAT DO WE PROVIDE?
-                  </h2>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
-                    viewport={{ once: true }}
-                  >
-                    We are a dynamic startup based in Pune, driven by a team of
-                    young and passionate developers dedicated to revolutionizing
-                    the IT industry.
-                  </motion.p>
-                </motion.header>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="overflow-x-auto pb-6"
-                >
-                  <div className="flex space-x-6 px-4 min-w-max justify-center">
-                    {[
-                      {
-                        name: "Website Development",
-                        description:
-                          "Build stunning, high-performance websites optimized for speed and SEO",
-                        icon: "💻",
-                        features: [
-                          "Responsive Design",
-                          "SEO Optimized",
-                          "Fast Loading",
-                        ],
-                      },
-                      {
-                        name: "Android Development",
-                        description:
-                          "Create seamless mobile experiences with native Android applications",
-                        icon: "📱",
-                        features: [
-                          "Native Performance",
-                          "Material Design",
-                          "Play Store Ready",
-                        ],
-                      },
-                      {
-                        name: "iOS Development",
-                        description:
-                          "Engaging users with cutting-edge iOS apps and seamless UX",
-                        icon: "🍎",
-                        features: [
-                          "Swift/SwiftUI",
-                          "App Store Guidelines",
-                          "iOS Optimization",
-                        ],
-                      },
-                      {
-                        name: "Digital Marketing",
-                        description:
-                          "Boost your reach with data-driven marketing strategies",
-                        icon: "📈",
-                        features: ["SEO/SEM", "Social Media", "Analytics"],
-                      },
-                      {
-                        name: "Graphic Design",
-                        description:
-                          "Transform ideas into visual masterpieces and brand identity",
-                        icon: "🎨",
-                        features: [
-                          "Brand Identity",
-                          "Print Design",
-                          "Digital Graphics",
-                        ],
-                      },
-                      {
-                        name: "UI/UX Design",
-                        description:
-                          "Bring ideas to life with interactive designs",
-                        icon: "🖌️",
-                        features: [
-                          "User Research",
-                          "Prototyping",
-                          "Usability Testing",
-                        ],
-                      },
-                    ].map((service, index) => (
-                      <motion.div
-                        key={index}
-                        variants={itemVariants}
-                        className="flex-shrink-0 w-80 bg-emerald-400 text-white rounded-xl shadow-lg p-6 transform transition-all duration-300"
-                        whileHover={
-                          !shouldReduceMotion
-                            ? {
-                                scale: 1.05,
-                                y: -10,
-                                boxShadow:
-                                  "0 25px 50px -12px rgba(16, 185, 129, 0.4)",
-                                backgroundColor: "#059669",
-                              }
-                            : {}
-                        }
-                      >
-                        <div className="text-center">
-                          <div className="text-5xl mb-4">{service.icon}</div>
-                          <h3 className="text-2xl font-bold mb-4">
-                            {service.name}
-                          </h3>
-                          <p className="text-sm opacity-90 mb-4">
-                            {service.description}
-                          </p>
-                          <div className="mb-4">
-                            {service.features.map((feature, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-block bg-white bg-opacity-20 rounded-full px-2 py-1 text-xs mr-1 mb-1"
-                              >
-                                {feature}
-                              </span>
-                            ))}
-                          </div>
-                          <button className="bg-white text-emerald-500 px-4 py-2 rounded-full hover:bg-emerald-50 transition duration-300 font-semibold">
-                            Learn More
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Portfolio Section */}
-            <motion.section
-              id="portfolio"
-              className="min-h-screen p-8 sm:p-30 bg-gray-50"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl font-bold mb-4 text-gray-800">
-                    OUR PORTFOLIO
-                  </h2>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Explore our diverse range of successful projects that
-                    showcase our expertise in delivering innovative solutions.
-                  </p>
-                </motion.header>
-
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                  variants={containerVariants}
-                >
-                  {portfolioProjects.map((project) => (
-                    <PortfolioCard
-                      key={project.id}
-                      title={project.title}
-                      description={project.description}
-                      image={project.image}
-                      technologies={project.technologies}
-                      liveLink={project.liveLink}
-                      githubLink={project.githubLink}
-                    />
-                  ))}
-                </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="text-center mt-12"
-                >
-                  <motion.button
-                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                    whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                    className="bg-emerald-500 text-white px-8 py-3 rounded-lg hover:bg-emerald-600 transition-all duration-300"
-                  >
-                    View All Projects
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Blog Section */}
-            <motion.section
-              id="blog"
-              className="min-h-screen p-8 sm:p-30 bg-white"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl font-bold mb-4 text-gray-800">
-                    OUR BLOGS
-                  </h2>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Stay updated with the latest trends, insights, and
-                    innovations in technology.
-                  </p>
-                </motion.header>
-
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                  variants={containerVariants}
-                >
-                  {blogPosts.map((post) => (
-                    <BlogCard
-                      key={post.id}
-                      title={post.title}
-                      excerpt={post.excerpt}
-                      date={new Date(post.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                      image={post.image}
-                      category={post.category}
-                      slug={post.slug}
-                    />
-                  ))}
-                </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="text-center mt-12"
-                >
-                  <motion.button
-                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                    whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                    className="bg-emerald-500 text-white px-8 py-3 rounded-lg hover:bg-emerald-600 transition-all duration-300"
-                  >
-                    View All Blogs
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Contact Section */}
-            <motion.section
-              id="contact"
-              className="min-h-screen flex items-center sm:p-30 bg-emerald-500 sm:bg-white"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <div className="container mx-auto">
-                <div className="bg-emerald-500 w-full rounded-2xl p-8 sm:p-15">
-                  <div className="grid grid-cols-12 gap-8 items-center">
-                    <motion.div
-                      className="col-span-12 lg:col-span-6 text-white"
-                      initial={{ x: -50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <motion.button
+                      className="px-8 py-4 bg-white text-emerald-600 rounded-full font-semibold shadow-lg"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <header className="mb-6">
-                        <h2 className="sm:text-6xl text-4xl font-bold mb-4">
-                          WE'D LOVE TO HEAR FROM YOU!
-                        </h2>
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          className="text-lg leading-relaxed"
-                          viewport={{ once: true }}
-                        >
-                          Whether you have a question about our services, need
-                          assistance, or just want to share feedback, we're here
-                          to help.
-                        </motion.p>
-                      </header>
-
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                          <span>contact@innovativetech.com</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                          </svg>
-                          <span>+91 12345 67890</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>Pune, Maharashtra, India</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      className="col-span-12 lg:col-span-6"
-                      initial={{ x: 50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
+                      Start a Project
+                    </motion.button>
+                    <motion.button
+                      className="px-8 py-4 border-2 border-white text-white rounded-full font-semibold"
+                      whileHover={{
+                        scale: 1.05,
+                        y: -2,
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                      }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <div className="max-w-lg mx-auto p-6 bg-white shadow-2xl rounded-2xl">
-                        <motion.form
-                          initial="hidden"
-                          whileInView="visible"
-                          variants={containerVariants}
-                          className="space-y-6"
-                          viewport={{ once: true }}
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                          }}
-                        >
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="name"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Full Name *
-                            </label>
-                            <input
-                              type="text"
-                              id="name"
-                              name="name"
-                              required
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your full name"
-                            />
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="email"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Email Address *
-                            </label>
-                            <input
-                              type="email"
-                              id="email"
-                              name="email"
-                              required
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your email address"
-                            />
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="phone"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Phone Number
-                            </label>
-                            <input
-                              type="tel"
-                              id="phone"
-                              name="phone"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your phone number"
-                            />
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="service"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Service Interest
-                            </label>
-                            <select
-                              id="service"
-                              name="service"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                            >
-                              <option value="">Select a service</option>
-                              <option value="web-development">
-                                Web Development
-                              </option>
-                              <option value="mobile-development">
-                                Mobile Development
-                              </option>
-                              <option value="blockchain">
-                                Blockchain Technology
-                              </option>
-                              <option value="digital-marketing">
-                                Digital Marketing
-                              </option>
-                              <option value="ui-ux">UI/UX Design</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="message"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Message *
-                            </label>
-                            <textarea
-                              id="message"
-                              name="message"
-                              required
-                              rows="4"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200 resize-none"
-                              placeholder="Tell us about your project..."
-                            />
-                          </motion.div>
-
-                          <motion.button
-                            variants={itemVariants}
-                            whileHover={
-                              !shouldReduceMotion ? { scale: 1.02 } : {}
-                            }
-                            whileTap={
-                              !shouldReduceMotion ? { scale: 0.98 } : {}
-                            }
-                            type="submit"
-                            className="w-full bg-emerald-500 text-white py-3 px-6 rounded-lg hover:bg-emerald-600 transition-all duration-200 font-semibold"
-                          >
-                            Send Message
-                          </motion.button>
-
-                          <motion.p
-                            variants={itemVariants}
-                            className="text-xs text-gray-500 text-center"
-                          >
-                            * Required fields. We'll get back to you within 24
-                            hours.
-                          </motion.p>
-                        </motion.form>
-                      </div>
-                    </motion.div>
+                      Contact Us
+                    </motion.button>
                   </div>
+
+                  <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 text-white">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                      <div className="text-3xl mb-2">📧</div>
+                      <p className="font-semibold">contact@celsystech.com</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                      <div className="text-3xl mb-2">📱</div>
+                      <p className="font-semibold">+91 12345 67890</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+                      <div className="text-3xl mb-2">📍</div>
+                      <p className="font-semibold">Pune, Maharashtra</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="bg-gray-900 text-white py-12">
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="text-2xl font-bold mb-4 md:mb-0">
+                  Celsystech
                 </div>
+                <p className="text-gray-400">
+                  © 2024 Celsystech. All rights reserved.
+                </p>
               </div>
-            </motion.section>
-          </motion.main>
-        </Suspense>
-      </motion.div>
+            </div>
+          </footer>
+        </motion.div>
+      )}
     </>
   );
 };
 
-export default Home;
+export default App;

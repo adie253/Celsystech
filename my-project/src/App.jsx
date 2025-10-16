@@ -17,11 +17,7 @@ const MainApp = () => {
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
-  return showSplash ? (
-    <SplashScreen onComplete={() => setShowSplash(false)} />
-  ) : (
-    <MainApp />
-  );
+  return <MainApp />;
 };
 
 export default App;
