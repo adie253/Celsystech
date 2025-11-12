@@ -1,143 +1,191 @@
-import React, { useState } from "react";
-// import { Link } from 'react-scroll';
-import { Link, animateScroll as scroll } from "react-scroll";
-
-import "../style/Navbar.css";
+import { useEffect, useState } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  animate,
+} from "framer-motion";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+
+      // Active section detection
+      const sections = ["home", "about", "services", "blog", "contact"];
+      const current = sections.find((section) => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+      if (current) setActiveSection(current);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navItems = ["Home", "About", "Services", "Blog", "Contact"];
 
   return (
-    <div className="w-full fixed top-0 z-50 nav-bg">
-      {/* Navbar Container */}
-      <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
-        {/* Logo */}
-        <div className="flex-shrink-0 text-3xl font-bold text-gray-800">
-          Celsystech
+    <motion.nav
+      className={`fixed top-0 w-full z-40 transition-all duration-500 ${
+        scrolled
+          ? "bg-white/80 backdrop-blur-xl shadow-xl border-b border-gray-100"
+          : "bg-transparent"
+      }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-20">
+        <motion.div
+          className="flex items-center space-x-3"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 400 }}
+        >
+          <motion.div
+            className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg"
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="text-white font-bold text-xl">C</span>
+          </motion.div>
+          <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            Celsystech
+          </span>
+        </motion.div>
+
+        <div className="hidden md:flex items-center space-x-1 bg-gray-50/50 backdrop-blur-sm rounded-full px-2 py-2">
+          {navItems.map((item, idx) => {
+            const itemId = item.toLowerCase();
+            const isActive = activeSection === itemId;
+
+            return (
+              <motion.a
+                key={item}
+                href={`#${itemId}`}
+                className={`relative px-6 py-2.5 rounded-full font-medium transition-all duration-300 ${
+                  isActive
+                    ? "text-white"
+                    : scrolled
+                    ? "text-gray-700 hover:text-emerald-600"
+                    : "text-gray-800 hover:text-emerald-600"
+                }`}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * idx, type: "spring" }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full shadow-lg"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <span className="relative z-10">{item}</span>
+              </motion.a>
+            );
+          })}
         </div>
 
-        {/* Centered Navigation Menu for Larger Screens */}
-        <div className="hidden md:flex space-x-8">
-          <Link
-            to="home"
-            smooth={true}
-            duration={500}
-            className="text-gray-800 hover:text-emerald-600 nav-link"
+        <motion.button
+          className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-full shadow-lg font-semibold overflow-hidden group relative"
+          whileHover={{
+            scale: 1.05,
+            boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600"
+            initial={{ x: "100%" }}
+            whileHover={{ x: 0 }}
+            transition={{ duration: 0.3 }}
+          />
+          <span className="relative z-10">Get a Quote</span>
+          <motion.span
+            className="relative z-10"
+            animate={{ x: [0, 3, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
           >
-            Home
-          </Link>
-          <Link
-            to="about"
-            smooth={true}
-            duration={500}
-            className="text-gray-800 hover:text-emerald-600 nav-link"
-          >
-            About Us
-          </Link>
-          <Link
-            to="services"
-            smooth={true}
-            duration={500}
-            className="text-gray-800 hover:text-emerald-600 nav-link"
-          >
-            Services
-          </Link>
-          <Link
-            to="blog"
-            smooth={true}
-            duration={500}
-            className="text-gray-800 hover:text-emerald-600 nav-link"
-          >
-            Blog
-          </Link>
-          <Link
-            to="contact"
-            smooth={true}
-            duration={500}
-            className="text-gray-800 hover:text-emerald-600 nav-link"
-          >
-            Contact
-          </Link>
-        </div>
+            →
+          </motion.span>
+        </motion.button>
 
-        {/* Hamburger Menu Icon for Mobile Screens */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-800 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/* Get Quote Button */}
-        <div className="hidden md:block">
-          <a
-            href="#quote"
-            className="bg-emerald-500 text-white transition 
-    duration-300 
-    ease-in-out 
-    transform  px-6 py-2 rounded-lg shadow-md hover:bg-emerald-700 button"
-          >
-            Get a Quote
-          </a>
-        </div>
+        <motion.button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden relative w-10 h-10 flex items-center justify-center"
+          whileTap={{ scale: 0.9 }}
+        >
+          <motion.div className="w-6 h-5 flex flex-col justify-between">
+            <motion.span
+              className="w-full h-0.5 bg-gray-800 rounded-full"
+              animate={isMenuOpen ? { rotate: 45, y: 9 } : { rotate: 0, y: 0 }}
+            />
+            <motion.span
+              className="w-full h-0.5 bg-gray-800 rounded-full"
+              animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+            />
+            <motion.span
+              className="w-full h-0.5 bg-gray-800 rounded-full"
+              animate={
+                isMenuOpen ? { rotate: -45, y: -9 } : { rotate: 0, y: 0 }
+              }
+            />
+          </motion.div>
+        </motion.button>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <div className="flex flex-col items-center space-y-4 py-4">
-            <a href="#home" className="text-gray-800 hover:text-emerald-600">
-              Home
-            </a>
-            <a href="#about" className="text-gray-800 hover:text-emerald-600">
-              About Us
-            </a>
-            <a
-              href="#services"
-              className="text-gray-800 hover:text-emerald-600"
-            >
-              Services
-            </a>
-            <a href="#blog" className="text-gray-800 hover:text-emerald-600">
-              Blog
-            </a>
-            <a href="#contact" className="text-gray-800 hover:text-emerald-600">
-              Contact
-            </a>
-            <a
-              href="#quote"
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-emerald-700"
-            >
-              Get Quote
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            className="md:hidden bg-white/95 backdrop-blur-xl shadow-2xl border-t border-gray-100"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex flex-col px-6 py-6 space-y-1">
+              {navItems.map((item, idx) => (
+                <motion.a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className="px-4 py-3 text-gray-800 hover:text-emerald-600 font-medium rounded-xl hover:bg-emerald-50 transition-all"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item}
+                </motion.a>
+              ))}
+              <motion.button
+                className="mt-4 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Quote
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 };
 

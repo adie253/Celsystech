@@ -1,0 +1,6 @@
+        "root/dir_1 file_1.txt(abcd) file_2.txt(efgh)",
+        "root/dir_2 file_3.txt(abcd)",
+        "root/dir_2/dir_3 file_4.txt(efgh) file_5.txt(ijklmno)",
+        "rot/dir_2/dir_3 file_4.txt(efgh) file_5.txtt(ijklmno)",
+        "root/dir_77 file_3.txt(abcd)",
+        "roat/dir_2/dir_3 file_4.txtt(efgh) file_5.txt(ijklmno)"
