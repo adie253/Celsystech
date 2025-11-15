@@ -31,7 +31,8 @@ const Navbar = () => {
       if (current) setActiveSection(current);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initial check
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -42,7 +43,7 @@ const Navbar = () => {
       className={`fixed top-0 w-full z-40 transition-all duration-500 ${
         scrolled
           ? "bg-white/80 backdrop-blur-xl shadow-xl border-b border-gray-100"
-          : "bg-transparent"
+          : "bg-white/30 backdrop-blur-md"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
