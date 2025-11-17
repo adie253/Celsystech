@@ -1,16 +1,19 @@
 import itConsultancyHero from "../assets/Hero_4.jpeg";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import FloatingElement from "./ui/FloatingElement";
 import AnimatedCounter from "./ui/AnimatedCounter";
 import { blogs, contact, projects, services, stats, tagLines } from "./ui/Data";
 import FAQSection from "./ui/FaqPage";
+import { useState } from "react";
+import SimpleContactForm from "./ContactPage";
 
 const App = () => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -145,6 +148,7 @@ const App = () => {
                       boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
                     }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsOpen(true)} // open modal
                   >
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600"
@@ -163,6 +167,7 @@ const App = () => {
                     </span>
                   </motion.button>
 
+                  {/* Learn More Button */}
                   <motion.button
                     className="group relative px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-full font-semibold shadow-lg hover:shadow-xl overflow-hidden"
                     whileHover={{
@@ -189,6 +194,45 @@ const App = () => {
                     </span>
                   </motion.button>
                 </motion.div>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      {/* Modal Content */}
+                      <motion.div
+                        className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-y-auto max-h-[90vh]"
+                        initial={{ scale: 0.9, y: 20 }}
+                        animate={{ scale: 1, y: 0 }}
+                        exit={{ scale: 0.9, y: 20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {/* Close Button */}
+                        <button
+                          onClick={() => setIsOpen(false)}
+                          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl"
+                        >
+                          ×
+                        </button>
+
+                        {/* Contact Form */}
+                        <div className="p-6">
+                          <SimpleContactForm />
+                        </div>
+                      </motion.div>
+
+                      {/* Optional: Click outside to close */}
+                      <div
+                        className="absolute inset-0"
+                        onClick={() => setIsOpen(false)}
+                      ></div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Trust Indicators */}
                 <motion.div
@@ -895,6 +939,7 @@ const App = () => {
           </div>
         </section>
 
+        <FAQSection />
         {/* Blog Section - Enhanced */}
         <section
           id="blog"
@@ -1064,8 +1109,6 @@ const App = () => {
             </motion.div>
           </div>
         </section>
-
-        <FAQSection />
 
         {/* Contact Section - Enhanced */}
         <section

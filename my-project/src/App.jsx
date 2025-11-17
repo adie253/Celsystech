@@ -7,6 +7,8 @@ import Home from "./components/Home";
 import LearnMore from "./components/ui/LearnMore";
 import SplashScreen from "./components/ui/SplashScreen";
 import PortfolioPage from "./components/PortfolioPage";
+import GetQuote from "./components/Get_Quote";
+import SimpleContactForm from "./components/ContactPage";
 
 const App = () => {
   // ✅ Splash state with session persistence
@@ -47,6 +49,8 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<LearnMore />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/quote" element={<GetQuote />} />
+            <Route path="/contact" element={<SimpleContactForm />} />
           </Routes>
         </motion.div>
       )}

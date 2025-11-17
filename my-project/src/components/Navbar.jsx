@@ -8,11 +8,13 @@ import {
   useTransform,
   animate,
 } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,8 +25,8 @@ const Navbar = () => {
         "home",
         "about",
         "services",
-        "Portfolio",
-        "FAQ",
+        "portfolio",
+        "faq",
         "blog",
         "contact",
       ];
@@ -125,6 +127,7 @@ const Navbar = () => {
             boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
           }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/quote")}
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600"
