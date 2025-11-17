@@ -19,7 +19,15 @@ const Navbar = () => {
       setScrolled(window.scrollY > 50);
 
       // Active section detection
-      const sections = ["home", "about", "services", "blog", "contact"];
+      const sections = [
+        "home",
+        "about",
+        "services",
+        "Portfolio",
+        "FAQ",
+        "blog",
+        "contact",
+      ];
       const current = sections.find((section) => {
         const element = document.getElementById(section);
         if (element) {
@@ -32,11 +40,19 @@ const Navbar = () => {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = ["Home", "About", "Services", "Blog", "Contact"];
+  const navItems = [
+    "Home",
+    "About",
+    "Services",
+    "Portfolio",
+    "FAQ",
+    "Blog",
+    "Contact",
+  ];
 
   return (
     <motion.nav

@@ -1,76 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {
-  motion,
-  useScroll,
-  useSpring,
-  AnimatePresence,
-  useMotionValue,
-  useTransform,
-  animate,
-} from "framer-motion";
+import itConsultancyHero from "../assets/Hero_4.jpeg";
+import { motion, useScroll, useSpring } from "framer-motion";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
-import SplashScreen from "./ui/SplashScreen";
 import FloatingElement from "./ui/FloatingElement";
 import AnimatedCounter from "./ui/AnimatedCounter";
 import { blogs, contact, projects, services, stats, tagLines } from "./ui/Data";
 import FAQSection from "./ui/FaqPage";
 
-// const AnimatedCounter = ({ value, duration = 2, delay = 0 }) => {
-//   const count = useMotionValue(0);
-//   const rounded = useTransform(count, (latest) => {
-//     // Handle percentage
-//     if (value.includes("%")) {
-//       return Math.round(latest) + "%";
-//     }
-//     // Handle plus sign
-//     if (value.includes("+")) {
-//       return Math.round(latest) + "+";
-//     }
-//     // Handle 24/7 format
-//     if (value.includes("/")) {
-//       return value;
-//     }
-//     return Math.round(latest);
-//   });
-
-//   const [displayValue, setDisplayValue] = useState("0");
-
-//   useEffect(() => {
-//     // Extract numeric value
-//     const numericValue = parseInt(value.replace(/[^\d]/g, ""));
-
-//     const controls = animate(count, numericValue, {
-//       duration,
-//       delay,
-//       ease: "easeOut",
-//       onUpdate: (latest) => {
-//         if (value.includes("%")) {
-//           setDisplayValue(Math.round(latest) + "%");
-//         } else if (value.includes("+")) {
-//           setDisplayValue(Math.round(latest) + "+");
-//         } else if (value.includes("/")) {
-//           // For 24/7, animate both numbers
-//           const progress = latest / numericValue;
-//           const firstNum = Math.round(24 * progress);
-//           const secondNum = Math.round(7 * progress);
-//           setDisplayValue(`${firstNum}/${secondNum}`);
-//         } else {
-//           setDisplayValue(Math.round(latest).toString());
-//         }
-//       },
-//     });
-
-//     return () => controls.stop();
-//   }, [value, duration, delay, count]);
-
-//   return <span>{displayValue}</span>;
-// };
-
-// Main App Component
-
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
   const navigate = useNavigate();
@@ -89,10 +26,6 @@ const App = () => {
         />
       </motion.div>
       <Navbar />
-      {/* <AnimatePresence mode="wait">
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-      </AnimatePresence> */}
-
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -308,14 +241,14 @@ const App = () => {
                 transition={{ duration: 1, delay: 0.4 }}
                 style={{ perspective: 1000 }}
               >
-                <FloatingElement duration={4} amplitude={15}>
-                  <motion.div
-                    className="relative group"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    {/* Decorative Elements */}
-                    <motion.div
+                {/* <FloatingElement duration={4} amplitude={15}> */}
+                <motion.div
+                  className="relative group"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {/* Decorative Elements */}
+                  {/* <motion.div
                       className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl shadow-2xl z-10"
                       animate={{
                         rotate: [0, 10, 0],
@@ -326,22 +259,22 @@ const App = () => {
                       <div className="w-full h-full flex items-center justify-center text-white text-3xl">
                         💡
                       </div>
-                    </motion.div>
+                    </motion.div> */}
 
-                    {/* Main Image */}
-                    <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                      <motion.div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <img
-                        src="https://img.freepik.com/free-vector/man-playing-online-games-concept_52683-37362.jpg"
-                        alt="Professional working with technology"
-                        className="w-full h-auto relative z-0 transform group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
+                  {/* Main Image */}
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                    <motion.div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <img
+                      src={itConsultancyHero}
+                      alt="Professional IT consultancy services with technology experts collaborating"
+                      className="w-full h-auto relative z-0 transform group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
 
-                    {/* Glow Effect */}
-                    <div className="absolute -inset-6 bg-gradient-to-r from-emerald-400/30 via-teal-500/30 to-blue-500/30 rounded-3xl blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-                  </motion.div>
-                </FloatingElement>
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-6 bg-gradient-to-r from-emerald-400/30 via-teal-500/30 to-blue-500/30 rounded-3xl blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                </motion.div>
+                {/* </FloatingElement> */}
               </motion.div>
             </div>
           </div>
