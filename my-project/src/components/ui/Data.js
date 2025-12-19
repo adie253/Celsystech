@@ -382,38 +382,43 @@ const services2 = [
 const projects = [
   {
     id: 1,
-    title: "AI-Powered Analytics Dashboard",
+    title: "Ajeenkya DY Patil - Research Paper Publication Web Application",
     description:
-      "An intelligent analytics platform providing real-time insights and predictive metrics for enterprises.",
+      "An intertactive website which allows publication of reasearch paper of students",
     image:
-      "https://img.freepik.com/free-vector/dashboard-interface-user-experience_23-2148711009.jpg",
-    techStack: ["React", "Node.js", "Python", "TensorFlow", "PostgreSQL"],
-    link: "https://yourprojectlink1.com",
+      "https://res.cloudinary.com/dbp9kern3/image/upload/v1763358832/adypjiet_l4olcn.png",
+    techStack: [
+      "React js",
+      "Node.js",
+      "Express.js",
+      "Tailwind CSS",
+      "PostgreSQL",
+      "MongoDB",
+    ],
+    link: "https://adypsoe.in/adypjiet/index_old.html",
     gradient: "from-indigo-500 to-blue-600",
   },
   {
     id: 2,
-    title: "E-Commerce Web Platform",
+    title: "Flowchart Maker Web Application - Node Manager",
     description:
-      "A modern, scalable online store with real-time inventory, payments, and custom recommendation engine.",
+      "A modern, scalable online flowchart designer helps in designing the LLM structure",
     image:
-      "https://img.freepik.com/free-vector/ecommerce-website-illustration_114360-8204.jpg",
-    techStack: ["Next.js", "Stripe", "Firebase", "Tailwind CSS"],
-    link: "https://yourprojectlink2.com",
+      "https://res.cloudinary.com/dbp9kern3/image/upload/v1763359216/flowchart_i47d7c.png",
+    techStack: ["Next.js", "React flow", "Tailwind CSS", "Material UI"],
+    link: "https://node-manager-flowchart-desginer.vercel.app/",
     gradient: "from-emerald-500 to-teal-600",
   },
   {
     id: 3,
-    title: "Automation Workflow System",
-    description:
-      "Business automation platform integrating APIs, tasks, and data pipelines with a clean dashboard UI.",
+    title: "Premium Pastery Shop",
+    description: "Premium website for showcase of pastery for sale",
     image:
-      "https://img.freepik.com/free-vector/robot-analyzing-data-illustration_114360-5323.jpg",
-    techStack: ["n8n", "Express.js", "MongoDB", "React", "Docker"],
-    link: "https://yourprojectlink3.com",
+      "https://res.cloudinary.com/dbp9kern3/image/upload/v1763360058/pastery_dmirpj.png",
+    techStack: ["Next.js", "React flow", "Tailwind CSS", "Material UI"],
+    link: "https://pastery-shop-ui-qmvu.vercel.app/",
     gradient: "from-orange-500 to-amber-600",
   },
-  // You can add more for the detailed /portfolio page
 ];
 
 export { stats, tagLines, services, blogs, contact, services2, projects };
