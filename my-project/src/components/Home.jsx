@@ -1,1134 +1,1503 @@
-import React, { lazy, Suspense, useMemo, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
-import "../style/Home.css";
-import { Link, animateScroll as scroll } from "react-scroll";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "framer-motion";
+import itConsultancyHero from "../assets/Hero_4.jpeg";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
+import FloatingElement from "./ui/FloatingElement";
+import AnimatedCounter from "./ui/AnimatedCounter";
+import { blogs, contact, projects, services, stats, tagLines } from "./ui/Data";
+import FAQSection from "./ui/FaqPage";
+import { useState } from "react";
+import SimpleContactForm from "./ContactPage";
 
-const Navbar = lazy(() => import("./Navbar"));
-const Typewriter = lazy(() => import("typewriter-effect"));
-
-// Optimized Animation Variants with better performance
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    x: "-100vw",
-    willChange: "transform, opacity",
-  },
-  in: {
-    opacity: 1,
-    x: 0,
-    willChange: "auto",
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 20,
-    },
-  },
-  out: {
-    opacity: 0,
-    x: "100vw",
-    willChange: "transform, opacity",
-  },
-};
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      delayChildren: 0.2,
-      staggerChildren: 0.15,
-      ease: "easeOut",
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-    willChange: "transform, opacity",
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    willChange: "auto",
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-const BlogCard = ({ title, excerpt, date, image, category, slug }) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.article
-      className="blog-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full"
-      whileHover={
-        !shouldReduceMotion
-          ? {
-              scale: 1.03,
-              y: -5,
-              boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: {
-                duration: 0.2,
-                ease: "easeOut",
-              },
-            }
-          : {}
-      }
-      layout
-    >
-      <div className="blog-card-image">
-        <img
-          src={image}
-          alt={`Featured image for ${title}`}
-          className="w-full h-48 object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex justify-between items-center mb-2">
-          <span
-            className="text-emerald-600 font-semibold text-sm"
-            aria-label={`Category: ${category}`}
-          >
-            {category}
-          </span>
-          <time className="text-gray-500 text-sm" dateTime={date}>
-            {date}
-          </time>
-        </div>
-        <h3 className="text-xl font-bold mb-2 text-gray-800 flex-grow">
-          {title}
-        </h3>
-        <p className="text-gray-600 mb-4 flex-grow">{excerpt}</p>
-        <button
-          className="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 self-start"
-          aria-label={`Read more about ${title}`}
-        >
-          Read More
-        </button>
-      </div>
-    </motion.article>
-  );
-};
-
-const PortfolioCard = ({
-  title,
-  description,
-  image,
-  technologies,
-  liveLink,
-  githubLink,
-}) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      className="portfolio-card bg-white rounded-lg shadow-lg overflow-hidden"
-      whileHover={
-        !shouldReduceMotion
-          ? {
-              y: -8,
-              scale: 1.02,
-              transition: { duration: 0.2 },
-            }
-          : {}
-      }
-      layout
-    >
-      <div className="relative overflow-hidden">
-        <img
-          src={image}
-          alt={`Screenshot of ${title} project`}
-          className="w-full h-64 object-cover transition-transform duration-300 hover:scale-110"
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="text-center">
-            {liveLink && (
-              <a
-                href={liveLink}
-                className="bg-emerald-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-emerald-600 transition duration-200"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View live demo of ${title}`}
-              >
-                Live Demo
-              </a>
-            )}
-            {githubLink && (
-              <a
-                href={githubLink}
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition duration-200"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`View source code of ${title} on GitHub`}
-              >
-                Source Code
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 text-gray-800">{title}</h3>
-        <p className="text-gray-600 mb-4">{description}</p>
-        <div className="flex flex-wrap gap-2">
-          {technologies?.map((tech, index) => (
-            <span
-              key={index}
-              className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const Home = () => {
+const App = () => {
   const { scrollYProgress } = useScroll();
-  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
-  const shouldReduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-    return () => {
-      document.documentElement.style.scrollBehavior = "auto";
-    };
-  }, []);
-
-  const blogPosts = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "The Future of Web Development in 2024",
-        excerpt:
-          "Dive deep into the emerging trends transforming web development, from AI-powered design to advanced performance optimization techniques.",
-        date: "2024-01-15",
-        image:
-          "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80",
-        category: "Web Technology",
-        slug: "future-of-web-development-2024",
-      },
-      {
-        id: 2,
-        title: "AI and Machine Learning: Transforming Business Solutions",
-        excerpt:
-          "Explore how artificial intelligence is revolutionizing business strategies, from predictive analytics to intelligent automation and decision-making.",
-        date: "2024-02-03",
-        image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-        category: "Artificial Intelligence",
-        slug: "ai-ml-transforming-business-solutions",
-      },
-      {
-        id: 3,
-        title: "Blockchain: Beyond Cryptocurrency Innovations",
-        excerpt:
-          "Uncover the transformative potential of blockchain technology across industries, from supply chain management to secure digital identities.",
-        date: "2024-03-20",
-        image:
-          "https://online.stanford.edu/sites/default/files/inline-images/1600X900-How-does-blockchain-work.jpg",
-        category: "Blockchain Technology",
-        slug: "blockchain-beyond-cryptocurrency",
-      },
-    ],
-    []
-  );
-
-  const portfolioProjects = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "E-Commerce Platform",
-        description:
-          "A modern, responsive e-commerce platform with advanced features like real-time inventory management, secure payment processing, and AI-powered product recommendations.",
-        image:
-          "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 2,
-        title: "Healthcare Management System",
-        description:
-          "Comprehensive healthcare management system with patient records, appointment scheduling, telemedicine capabilities, and HIPAA compliance.",
-        image:
-          "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["React Native", "Firebase", "Express.js", "PostgreSQL"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 3,
-        title: "FinTech Mobile App",
-        description:
-          "Secure mobile banking application with biometric authentication, real-time transactions, budget tracking, and investment portfolio management.",
-        image:
-          "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Flutter", "Django", "Redis", "AWS"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 4,
-        title: "AI-Powered Analytics Dashboard",
-        description:
-          "Business intelligence dashboard with machine learning insights, predictive analytics, and interactive data visualization for enterprise clients.",
-        image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Vue.js", "Python", "TensorFlow", "D3.js"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 5,
-        title: "Blockchain Supply Chain",
-        description:
-          "Transparent supply chain management system using blockchain technology for product authentication, traceability, and smart contracts.",
-        image:
-          "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Solidity", "Web3.js", "React", "IPFS"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-      {
-        id: 6,
-        title: "EdTech Learning Platform",
-        description:
-          "Interactive online learning platform with video streaming, progress tracking, gamification elements, and collaborative tools for educators.",
-        image:
-          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        technologies: ["Next.js", "GraphQL", "Socket.io", "MySQL"],
-        liveLink: "#",
-        githubLink: "#",
-      },
-    ],
-    []
-  );
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      {/* <Helmet>
-        <title>
-          Innovative Tech - Cutting Edge Technological Solutions | Web
-          Development, Mobile Apps & Blockchain
-        </title>
-        <meta
-          name="description"
-          content="Transform your business with advanced tech solutions. Specializing in web development, mobile apps, blockchain technology, and digital innovation. Get a quote today!"
-        />
-        <meta
-          name="keywords"
-          content="web development, mobile app development, blockchain, digital marketing, UI/UX design, software development, technology solutions"
-        />
-        <meta name="author" content="Innovative Tech" />
-        <meta
-          property="og:title"
-          content="Innovative Tech - Cutting Edge Technological Solutions"
-        />
-        <meta
-          property="og:description"
-          content="Transform your business with advanced tech solutions. Specializing in web development, mobile apps, blockchain technology."
-        />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourwebsite.com" />
-        <meta
-          property="og:image"
-          content="https://yourwebsite.com/og-image.jpg"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href="https://yourwebsite.com" />
-      </Helmet> */}
-
+      {/* Progress Bar */}
       <motion.div
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={{ duration: 0.5 }}
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-blue-500 origin-left z-50"
+        style={{ scaleX }}
       >
-        <Suspense
-          fallback={
-            <motion.div
-              className="flex items-center justify-center min-h-screen"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="text-2xl font-semibold text-emerald-600">
-                Loading...
-              </div>
-            </motion.div>
-          }
+        <motion.div
+          className="h-full bg-white/30 blur-sm"
+          animate={{ x: ["0%", "100%"] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+      </motion.div>
+      <Navbar />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        {/* Hero Section - Enhanced */}
+        <section
+          id="home"
+          className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-emerald-50 pt-20"
         >
-          <Navbar />
-          <motion.main
-            className="masterdiv"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Hero Section */}
-            <motion.section
-              id="home"
-              className="min-h-screen bg-white p-8 sm:p-30 flex items-center"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="container mx-auto">
-                <div className="grid grid-cols-12 gap-8 items-center">
-                  <motion.div
-                    className="col-span-12 lg:col-span-6"
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    viewport={{ once: true }}
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <FloatingElement delay={0} duration={5} amplitude={30}>
+              <div className="absolute top-20 left-10 w-80 h-80 bg-gradient-to-br from-emerald-200/40 to-teal-200/40 rounded-full blur-3xl" />
+            </FloatingElement>
+            <FloatingElement delay={1} duration={6} amplitude={40}>
+              <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br from-blue-200/40 to-purple-200/40 rounded-full blur-3xl" />
+            </FloatingElement>
+            <FloatingElement delay={2} duration={7} amplitude={25}>
+              <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br from-pink-200/30 to-orange-200/30 rounded-full blur-3xl" />
+            </FloatingElement>
+
+            {/* Grid Pattern */}
+            <div className="absolute inset-0 opacity-[0.03]">
+              <div
+                className="w-full h-full"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)",
+                  backgroundSize: "100px 100px",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                <motion.div
+                  className="inline-block mb-6"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3, type: "spring" }}
+                >
+                  <div className="px-5 py-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-700 rounded-full text-sm font-semibold flex items-center space-x-2 shadow-sm">
+                    <motion.span
+                      animate={{ rotate: [0, 360] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    >
+                      ✨
+                    </motion.span>
+                    <span>Welcome to Innovation</span>
+                  </div>
+                </motion.div>
+
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1]">
+                  <motion.span
+                    className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
                   >
-                    <header>
-                      <h1 className="sm:text-6xl text-4xl main-heading typewriter mb-4">
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.5, duration: 0.5 }}
-                        >
-                          <Suspense fallback={<span>CUTTING EDGE</span>}>
-                            <Typewriter
-                              options={{
-                                strings: [
-                                  "CUTTING EDGE",
-                                  "ADVANCE",
-                                  "INNOVATIVE",
-                                ],
-                                autoStart: true,
-                                loop: true,
-                                deleteSpeed: 50,
-                                delay: 100,
-                              }}
-                            />
-                          </Suspense>
-                        </motion.span>
-                      </h1>
+                    CUTTING EDGE
+                  </motion.span>
+                  <motion.span
+                    className="block bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    TECHNOLOGICAL
+                  </motion.span>
+                  <motion.span
+                    className="block text-gray-900"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    SOLUTIONS
+                  </motion.span>
+                </h1>
 
-                      <motion.h2
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        className="sm:text-6xl text-4xl main-heading mb-8"
-                        viewport={{ once: true }}
+                <motion.p
+                  className="text-lg text-gray-600 mb-10 leading-relaxed max-w-xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  At{" "}
+                  <span>
+                    <b>Celsystech</b>
+                  </span>
+                  , we transform ideas into impactful digital solutions.
+                  Specializing in website and app development, project
+                  management, and blockchain technology.
+                </motion.p>
+
+                <motion.div
+                  className="flex flex-wrap gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <motion.button
+                    className="group relative px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full font-semibold shadow-xl overflow-hidden"
+                    whileHover={{
+                      scale: 1.05,
+                      y: -3,
+                      boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsOpen(true)} // open modal
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <span>Get Started</span>
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
                       >
-                        TECHNOLOGICAL SOLUTIONS
-                      </motion.h2>
-                    </header>
+                        →
+                      </motion.span>
+                    </span>
+                  </motion.button>
 
-                    <motion.p
+                  {/* Learn More Button */}
+                  <motion.button
+                    className="group relative px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-full font-semibold shadow-lg hover:shadow-xl overflow-hidden"
+                    whileHover={{
+                      scale: 1.05,
+                      y: -3,
+                      borderColor: "rgb(16, 185, 129)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-emerald-50 to-teal-50"
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileHover={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <span className="relative z-10 flex items-center space-x-2 group-hover:text-emerald-600 transition-colors">
+                      <span>Learn More</span>
+                      <motion.span
+                        className="w-5 h-5 border-2 border-current rounded-full flex items-center justify-center text-xs"
+                        whileHover={{ rotate: 90 }}
+                      >
+                        ▶
+                      </motion.span>
+                    </span>
+                  </motion.button>
+                </motion.div>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
                       initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      className="text-justify text-lg text-gray-800 mb-8 leading-relaxed"
-                      viewport={{ once: true }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                     >
-                      At Innovative Tech, we transform ideas into impactful
-                      digital solutions. Specializing in website and app
-                      development, project management, and blockchain
-                      technology, we empower businesses to grow through
-                      technology. Our team is dedicated to delivering tailored
-                      solutions that meet your unique needs with creativity,
-                      precision, and expertise. Let's build something
-                      extraordinary together!
-                    </motion.p>
+                      {/* Modal Content */}
+                      <motion.div
+                        className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-y-auto max-h-[90vh]"
+                        initial={{ scale: 0.9, y: 20 }}
+                        animate={{ scale: 1, y: 0 }}
+                        exit={{ scale: 0.9, y: 20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {/* Close Button */}
+                        <button
+                          onClick={() => setIsOpen(false)}
+                          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl"
+                        >
+                          ×
+                        </button>
 
-                    <motion.button
-                      whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                      whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                      className="bg-emerald-500 text-white px-8 py-3 transition-all duration-200 ease-in-out transform rounded-lg shadow"
+                        {/* Contact Form */}
+                        <div className="p-6">
+                          <SimpleContactForm />
+                        </div>
+                      </motion.div>
+
+                      {/* Optional: Click outside to close */}
+                      <div
+                        className="absolute inset-0"
+                        onClick={() => setIsOpen(false)}
+                      ></div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Trust Indicators */}
+                <motion.div
+                  className="mt-12 flex items-center space-x-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                >
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white shadow-lg flex items-center justify-center text-white font-bold"
+                        initial={{ scale: 0, x: -20 }}
+                        animate={{ scale: 1, x: 0 }}
+                        transition={{ delay: 1 + i * 0.1, type: "spring" }}
+                        whileHover={{ scale: 1.2, zIndex: 10 }}
+                      >
+                        {String.fromCharCode(65 + i)}
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-bold text-gray-900">50+</span> Happy
+                      Clients
+                    </p>
+                    <div className="flex items-center space-x-1 mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <motion.span
+                          key={i}
+                          className="text-yellow-400"
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 1.2 + i * 0.1 }}
+                        >
+                          ⭐
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Hero Image with 3D Effect */}
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
+                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                style={{ perspective: 1000 }}
+              >
+                {/* <FloatingElement duration={4} amplitude={15}> */}
+                <motion.div
+                  className="relative group"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {/* Decorative Elements */}
+                  {/* <motion.div
+                      className="absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl shadow-2xl z-10"
+                      animate={{
+                        rotate: [0, 10, 0],
+                        y: [0, -10, 0],
+                      }}
+                      transition={{ duration: 3, repeat: Infinity }}
                     >
-                      Get a Quote
-                    </motion.button>
-                  </motion.div>
+                      <div className="w-full h-full flex items-center justify-center text-white text-3xl">
+                        💡
+                      </div>
+                    </motion.div> */}
+
+                  {/* Main Image */}
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                    <motion.div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <img
+                      src={itConsultancyHero}
+                      alt="Professional IT consultancy services with technology experts collaborating"
+                      className="w-full h-auto relative z-0 transform group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-6 bg-gradient-to-r from-emerald-400/30 via-teal-500/30 to-blue-500/30 rounded-3xl blur-3xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                </motion.div>
+                {/* </FloatingElement> */}
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            className="absolute bottom-10 left-1/3 transform -translate-x-1/2 z-50"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="flex flex-col items-center space-y-2">
+              <p className="text-sm text-gray-500 font-medium">
+                Scroll to explore
+              </p>
+              <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center pt-2 relative overflow-hidden">
+                <motion.div
+                  className="w-1.5 h-3 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"
+                  animate={{ y: [0, 16, 0], opacity: [1, 0, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Stats Section - Enhanced */}
+        <section className="py-24 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 relative overflow-hidden">
+          {/* Animated Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, white 1px, transparent 1px)",
+                backgroundSize: "50px 50px",
+              }}
+              animate={{ backgroundPosition: ["0px 0px", "50px 50px"] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+
+          {/* Floating Orbs */}
+          <FloatingElement duration={8} amplitude={30}>
+            <div className="absolute top-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+          </FloatingElement>
+          <FloatingElement duration={10} amplitude={40}>
+            <div className="absolute bottom-10 right-10 w-80 h-80 bg-teal-300/10 rounded-full blur-3xl" />
+          </FloatingElement>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {stats.map((stat, idx) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, amount: 0.9 }}
+                  transition={{
+                    delay: idx * 0.15,
+                    type: "spring",
+                    bounce: 0.4,
+                  }}
+                  whileHover={{
+                    y: -12,
+                    scale: 1.05,
+                    transition: { type: "spring", stiffness: 400 },
+                  }}
+                  className="group relative"
+                >
+                  <div className="relative bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl hover:bg-white/20 transition-all duration-500 overflow-hidden">
+                    {/* Shine Effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.6 }}
+                    />
+
+                    {/* Icon */}
+                    <motion.div
+                      className={`w-16 h-16 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg mx-auto`}
+                      initial={{ scale: 0, rotate: -180 }}
+                      whileInView={{ scale: 1, rotate: 0 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        delay: idx * 0.15,
+                        type: "spring",
+                        bounce: 0.5,
+                      }}
+                      whileHover={{
+                        rotate: [0, -10, 10, -10, 0],
+                        scale: 1.1,
+                      }}
+                    >
+                      {stat.icon}
+                    </motion.div>
+
+                    {/* Animated Number Counter */}
+                    <motion.div
+                      className="text-6xl font-bold mb-3 text-white"
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ delay: idx * 0.15 + 0.3, type: "spring" }}
+                    >
+                      <AnimatedCounter
+                        value={stat.number}
+                        duration={2.5}
+                        delay={idx * 0.15 + 0.5}
+                      />
+                    </motion.div>
+
+                    <div className="text-lg text-white/95 font-medium">
+                      {stat.label}
+                    </div>
+
+                    <p className="text-sm text-white/80 leading-relaxed">
+                      {stat.desc}
+                    </p>
+
+                    {/* Decorative Corner */}
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent rounded-bl-3xl" />
+                  </div>
+
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-2 bg-gradient-to-r from-white/0 via-white/20 to-white/0 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* About Section - Enhanced */}
+        <section
+          id="about"
+          className="py-32 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden"
+        >
+          {/* Background Decoration */}
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-6">
+            <motion.div
+              className="text-center mb-20"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                className="inline-block mb-4"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", bounce: 0.5 }}
+              >
+                <span className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                  About Us
+                </span>
+              </motion.div>
+
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-gray-900 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  What Do We Do?
+                </span>
+              </h2>
+
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Transforming visions into reality with cutting-edge technology
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+              {/* Image Side */}
+              <motion.div
+                initial={{ opacity: 0, x: -50, rotateY: -20 }}
+                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+                style={{ perspective: 1000 }}
+              >
+                <FloatingElement duration={5} amplitude={20}>
+                  <div className="relative group">
+                    {/* Main Image Container */}
+                    <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                      <motion.div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <img
+                        src="https://img.freepik.com/free-vector/product-presentation-concept-illustration_114360-8196.jpg"
+                        alt="Business presentation"
+                        className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700"
+                      />
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <motion.div
+                      className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl opacity-20 blur-2xl group-hover:opacity-40 transition-opacity"
+                      animate={{ rotate: [0, 90, 0] }}
+                      transition={{ duration: 10, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl opacity-20 blur-2xl group-hover:opacity-40 transition-opacity"
+                      animate={{ rotate: [0, -90, 0] }}
+                      transition={{ duration: 8, repeat: Infinity }}
+                    />
+
+                    {/* Frame Decoration */}
+                    <div className="absolute -inset-4 border-2 border-emerald-200 rounded-3xl -z-10 group-hover:border-emerald-400 transition-colors" />
+                  </div>
+                </FloatingElement>
+              </motion.div>
+
+              {/* Content Side */}
+              <div className="space-y-6">
+                {tagLines.map((item, idx) => (
                   <motion.div
-                    className="col-span-12 lg:col-span-6 flex justify-center"
+                    key={idx}
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
                     viewport={{ once: true }}
+                    transition={{ delay: idx * 0.2, duration: 0.6 }}
+                    whileHover={{ x: 10 }}
                   >
-                    <motion.img
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      className="max-w-full h-auto"
-                      src="https://img.freepik.com/free-vector/man-playing-online-games-concept_52683-37362.jpg"
-                      alt="Professional working with cutting-edge technology"
-                      loading="eager"
-                      decoding="async"
-                      viewport={{ once: true }}
-                    />
-                  </motion.div>
-                </div>
-              </div>
-            </motion.section>
-
-            {/* About Section */}
-            <motion.section
-              id="about"
-              className="min-h-screen p-8 sm:p-30 flex items-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header variants={itemVariants} className="mb-16">
-                  <h2 className="text-center sm:text-6xl mb-8 font-bold text-4xl">
-                    WHAT DO WE DO?
-                  </h2>
-                </motion.header>
-
-                <div className="grid grid-cols-12 gap-8 items-center">
-                  <motion.div
-                    className="col-span-12 lg:col-span-6 flex justify-center"
-                    variants={itemVariants}
-                  >
-                    <motion.img
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      className="max-w-full h-auto"
-                      src="https://img.freepik.com/free-vector/product-presentation-concept-illustration_114360-8196.jpg"
-                      alt="Business presentation concept"
-                      loading="lazy"
-                      decoding="async"
-                      viewport={{ once: true }}
-                    />
-                  </motion.div>
-
-                  <motion.div
-                    className="col-span-12 lg:col-span-6 space-y-12"
-                    variants={containerVariants}
-                  >
-                    {[
-                      {
-                        text: "Transform Your Business with",
-                        highlightText: "Advanced Tech!",
-                        description:
-                          "Our specialists provide the latest solutions to drive your success in the digital world.",
-                      },
-                      {
-                        text: "Harness the Power of",
-                        highlightText: "Smart Technology!",
-                        description:
-                          "Advanced tools designed to streamline operations and sharpen your competitive edge.",
-                      },
-                      {
-                        text: "Unlock New Possibilities with",
-                        highlightText: "Dedicated Team",
-                        description:
-                          "that offers the most advanced tools to enhance your competitive edge in the digital realm.",
-                      },
-                    ].map((item, index) => (
+                    <div className="group relative bg-gradient-to-br from-gray-50 via-white to-emerald-50 p-8 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                      {/* Hover Background Effect */}
                       <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.6,
-                          delay: index * 0.2,
-                        }}
-                        className="text-center lg:text-left"
-                        viewport={{ once: true }}
-                      >
-                        <h3 className="sm:text-4xl text-2xl main-heading leading-tight">
-                          {item.text}{" "}
-                          <motion.span
-                            initial={{ backgroundColor: "transparent" }}
-                            whileInView={{
-                              backgroundColor: "#fef08a",
-                              transition: {
-                                duration: 0.5,
-                                delay: index * 0.2 + 0.3,
-                              },
-                            }}
-                            className="bg-yellow-200 inline-block px-2 rounded"
-                          >
-                            {item.highlightText}
-                          </motion.span>{" "}
-                          <span className="block text-lg text-gray-600 mt-2 font-normal">
-                            {item.description}
-                          </span>
-                        </h3>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.section>
+                        className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-5`}
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: 0 }}
+                        transition={{ duration: 0.5 }}
+                      />
 
-            {/* Video Section */}
-            <motion.section
-              id="video"
-              className="min-h-screen p-8 sm:p-30 bg-gray-900 flex items-center"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="container mx-auto text-center">
-                <motion.header
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="mb-12"
-                  viewport={{ once: true }}
-                >
-                  <h2 className="sm:text-6xl text-4xl font-bold text-white mb-4">
-                    SEE OUR WORK IN ACTION
-                  </h2>
-                  <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Discover how we transform ideas into reality through our
-                    comprehensive development process.
-                  </p>
-                </motion.header>
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="relative max-w-4xl mx-auto"
-                  viewport={{ once: true }}
-                >
-                  <div className="relative aspect-video rounded-xl overflow-hidden shadow-2xl bg-gray-800 flex items-center justify-center">
-                    <p className="text-white text-lg">
-                      Video Player Placeholder
-                    </p>
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-white"
-                    viewport={{ once: true }}
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        50+
-                      </div>
-                      <p className="text-gray-300">Projects Completed</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        99%
-                      </div>
-                      <p className="text-gray-300">Client Satisfaction</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-emerald-400 mb-2">
-                        24/7
-                      </div>
-                      <p className="text-gray-300">Support Available</p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Services Section */}
-            <motion.section
-              id="services"
-              className="min-h-screen p-8 sm:p-30"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl mb-8 font-bold">
-                    WHAT DO WE PROVIDE?
-                  </h2>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
-                    viewport={{ once: true }}
-                  >
-                    We are a dynamic startup based in Pune, driven by a team of
-                    young and passionate developers dedicated to revolutionizing
-                    the IT industry.
-                  </motion.p>
-                </motion.header>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="overflow-x-auto pb-6"
-                >
-                  <div className="flex space-x-6 px-4 min-w-max justify-center">
-                    {[
-                      {
-                        name: "Website Development",
-                        description:
-                          "Build stunning, high-performance websites optimized for speed and SEO",
-                        icon: "💻",
-                        features: [
-                          "Responsive Design",
-                          "SEO Optimized",
-                          "Fast Loading",
-                        ],
-                      },
-                      {
-                        name: "Android Development",
-                        description:
-                          "Create seamless mobile experiences with native Android applications",
-                        icon: "📱",
-                        features: [
-                          "Native Performance",
-                          "Material Design",
-                          "Play Store Ready",
-                        ],
-                      },
-                      {
-                        name: "iOS Development",
-                        description:
-                          "Engaging users with cutting-edge iOS apps and seamless UX",
-                        icon: "🍎",
-                        features: [
-                          "Swift/SwiftUI",
-                          "App Store Guidelines",
-                          "iOS Optimization",
-                        ],
-                      },
-                      {
-                        name: "Digital Marketing",
-                        description:
-                          "Boost your reach with data-driven marketing strategies",
-                        icon: "📈",
-                        features: ["SEO/SEM", "Social Media", "Analytics"],
-                      },
-                      {
-                        name: "Graphic Design",
-                        description:
-                          "Transform ideas into visual masterpieces and brand identity",
-                        icon: "🎨",
-                        features: [
-                          "Brand Identity",
-                          "Print Design",
-                          "Digital Graphics",
-                        ],
-                      },
-                      {
-                        name: "UI/UX Design",
-                        description:
-                          "Bring ideas to life with interactive designs",
-                        icon: "🖌️",
-                        features: [
-                          "User Research",
-                          "Prototyping",
-                          "Usability Testing",
-                        ],
-                      },
-                    ].map((service, index) => (
-                      <motion.div
-                        key={index}
-                        variants={itemVariants}
-                        className="flex-shrink-0 w-80 bg-emerald-400 text-white rounded-xl shadow-lg p-6 transform transition-all duration-300"
-                        whileHover={
-                          !shouldReduceMotion
-                            ? {
-                                scale: 1.05,
-                                y: -10,
-                                boxShadow:
-                                  "0 25px 50px -12px rgba(16, 185, 129, 0.4)",
-                                backgroundColor: "#059669",
-                              }
-                            : {}
-                        }
-                      >
-                        <div className="text-center">
-                          <div className="text-5xl mb-4">{service.icon}</div>
-                          <h3 className="text-2xl font-bold mb-4">
-                            {service.name}
-                          </h3>
-                          <p className="text-sm opacity-90 mb-4">
-                            {service.description}
-                          </p>
-                          <div className="mb-4">
-                            {service.features.map((feature, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-block bg-white bg-opacity-20 rounded-full px-2 py-1 text-xs mr-1 mb-1"
-                              >
-                                {feature}
-                              </span>
-                            ))}
-                          </div>
-                          <button className="bg-white text-emerald-500 px-4 py-2 rounded-full hover:bg-emerald-50 transition duration-300 font-semibold">
-                            Learn More
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Portfolio Section */}
-            <motion.section
-              id="portfolio"
-              className="min-h-screen p-8 sm:p-30 bg-gray-50"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl font-bold mb-4 text-gray-800">
-                    OUR PORTFOLIO
-                  </h2>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Explore our diverse range of successful projects that
-                    showcase our expertise in delivering innovative solutions.
-                  </p>
-                </motion.header>
-
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                  variants={containerVariants}
-                >
-                  {portfolioProjects.map((project) => (
-                    <PortfolioCard
-                      key={project.id}
-                      title={project.title}
-                      description={project.description}
-                      image={project.image}
-                      technologies={project.technologies}
-                      liveLink={project.liveLink}
-                      githubLink={project.githubLink}
-                    />
-                  ))}
-                </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="text-center mt-12"
-                >
-                  <motion.button
-                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                    whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                    className="bg-emerald-500 text-white px-8 py-3 rounded-lg hover:bg-emerald-600 transition-all duration-300"
-                  >
-                    View All Projects
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Blog Section */}
-            <motion.section
-              id="blog"
-              className="min-h-screen p-8 sm:p-30 bg-white"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={containerVariants}
-            >
-              <div className="container mx-auto">
-                <motion.header
-                  variants={itemVariants}
-                  className="text-center mb-16"
-                >
-                  <h2 className="sm:text-6xl text-4xl font-bold mb-4 text-gray-800">
-                    OUR BLOGS
-                  </h2>
-                  <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                    Stay updated with the latest trends, insights, and
-                    innovations in technology.
-                  </p>
-                </motion.header>
-
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                  variants={containerVariants}
-                >
-                  {blogPosts.map((post) => (
-                    <BlogCard
-                      key={post.id}
-                      title={post.title}
-                      excerpt={post.excerpt}
-                      date={new Date(post.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                      image={post.image}
-                      category={post.category}
-                      slug={post.slug}
-                    />
-                  ))}
-                </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="text-center mt-12"
-                >
-                  <motion.button
-                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                    whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
-                    className="bg-emerald-500 text-white px-8 py-3 rounded-lg hover:bg-emerald-600 transition-all duration-300"
-                  >
-                    View All Blogs
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.section>
-
-            {/* Contact Section */}
-            <motion.section
-              id="contact"
-              className="min-h-screen flex items-center sm:p-30 bg-emerald-500 sm:bg-white"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true, amount: 0.3 }}
-            >
-              <div className="container mx-auto">
-                <div className="bg-emerald-500 w-full rounded-2xl p-8 sm:p-15">
-                  <div className="grid grid-cols-12 gap-8 items-center">
-                    <motion.div
-                      className="col-span-12 lg:col-span-6 text-white"
-                      initial={{ x: -50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
-                    >
-                      <header className="mb-6">
-                        <h2 className="sm:text-6xl text-4xl font-bold mb-4">
-                          WE'D LOVE TO HEAR FROM YOU!
-                        </h2>
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          className="text-lg leading-relaxed"
-                          viewport={{ once: true }}
-                        >
-                          Whether you have a question about our services, need
-                          assistance, or just want to share feedback, we're here
-                          to help.
-                        </motion.p>
-                      </header>
-
-                      <div className="space-y-4">
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                          <span>contact@innovativetech.com</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                          </svg>
-                          <span>+91 12345 67890</span>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>Pune, Maharashtra, India</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      className="col-span-12 lg:col-span-6"
-                      initial={{ x: 50, opacity: 0 }}
-                      whileInView={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.6 }}
-                      viewport={{ once: true }}
-                    >
-                      <div className="max-w-lg mx-auto p-6 bg-white shadow-2xl rounded-2xl">
-                        <motion.form
-                          initial="hidden"
-                          whileInView="visible"
-                          variants={containerVariants}
-                          className="space-y-6"
-                          viewport={{ once: true }}
-                          onSubmit={(e) => {
-                            e.preventDefault();
+                      <div className="relative z-10 flex items-start space-x-4">
+                        {/* Icon */}
+                        <motion.div
+                          className={`flex-shrink-0 w-14 h-14 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center text-2xl shadow-lg`}
+                          whileHover={{
+                            rotate: [0, -10, 10, -10, 0],
+                            scale: 1.1,
                           }}
+                          transition={{ duration: 0.5 }}
                         >
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="name"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Full Name *
-                            </label>
-                            <input
-                              type="text"
-                              id="name"
-                              name="name"
-                              required
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your full name"
-                            />
-                          </motion.div>
+                          {item.icon}
+                        </motion.div>
 
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="email"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Email Address *
-                            </label>
-                            <input
-                              type="email"
-                              id="email"
-                              name="email"
-                              required
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your email address"
-                            />
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="phone"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Phone Number
-                            </label>
-                            <input
-                              type="tel"
-                              id="phone"
-                              name="phone"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                              placeholder="Enter your phone number"
-                            />
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="service"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Service Interest
-                            </label>
-                            <select
-                              id="service"
-                              name="service"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200"
-                            >
-                              <option value="">Select a service</option>
-                              <option value="web-development">
-                                Web Development
-                              </option>
-                              <option value="mobile-development">
-                                Mobile Development
-                              </option>
-                              <option value="blockchain">
-                                Blockchain Technology
-                              </option>
-                              <option value="digital-marketing">
-                                Digital Marketing
-                              </option>
-                              <option value="ui-ux">UI/UX Design</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </motion.div>
-
-                          <motion.div variants={itemVariants}>
-                            <label
-                              htmlFor="message"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Message *
-                            </label>
-                            <textarea
-                              id="message"
-                              name="message"
-                              required
-                              rows="4"
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition duration-200 resize-none"
-                              placeholder="Tell us about your project..."
-                            />
-                          </motion.div>
-
-                          <motion.button
-                            variants={itemVariants}
-                            whileHover={
-                              !shouldReduceMotion ? { scale: 1.02 } : {}
-                            }
-                            whileTap={
-                              !shouldReduceMotion ? { scale: 0.98 } : {}
-                            }
-                            type="submit"
-                            className="w-full bg-emerald-500 text-white py-3 px-6 rounded-lg hover:bg-emerald-600 transition-all duration-200 font-semibold"
-                          >
-                            Send Message
-                          </motion.button>
-
-                          <motion.p
-                            variants={itemVariants}
-                            className="text-xs text-gray-500 text-center"
-                          >
-                            * Required fields. We'll get back to you within 24
-                            hours.
-                          </motion.p>
-                        </motion.form>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold mb-3 leading-tight">
+                            {item.title}{" "}
+                            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                              {item.highlight}
+                            </span>
+                          </h3>
+                          <p className="text-gray-600 leading-relaxed">
+                            {item.desc}
+                          </p>
+                        </div>
                       </div>
-                    </motion.div>
-                  </div>
-                </div>
+
+                      {/* Decorative Corner */}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-100/50 to-transparent rounded-bl-3xl" />
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            </motion.section>
-          </motion.main>
-        </Suspense>
+            </div>
+          </div>
+        </section>
+
+        {/* Services Section - Enhanced */}
+        <section
+          id="services"
+          className="py-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden"
+        >
+          {/* Animated Background */}
+          <div className="absolute inset-0">
+            <motion.div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%)",
+              }}
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.1, 0.2, 0.1],
+              }}
+              transition={{ duration: 10, repeat: Infinity }}
+            />
+          </div>
+
+          {/* Floating Particles */}
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-emerald-400/30 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.6, 0.2],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+
+          <div className="container mx-auto px-6 relative z-10">
+            <motion.div
+              className="text-center mb-20"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                className="inline-block mb-4"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", bounce: 0.5 }}
+              >
+                <span className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-full text-sm font-semibold backdrop-blur-sm">
+                  What We Offer
+                </span>
+              </motion.div>
+
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-white via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                  Our Services
+                </span>
+              </h2>
+
+              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+                Comprehensive solutions tailored to elevate your digital
+                presence
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {services.map((service, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: service.delay,
+                    type: "spring",
+                    bounce: 0.4,
+                  }}
+                  whileHover={{ y: -12, scale: 1.02 }}
+                  className="group relative"
+                >
+                  <div className="relative h-full bg-gray-800/50 backdrop-blur-sm border border-gray-700 p-8 rounded-3xl hover:border-emerald-500/50 transition-all duration-500 overflow-hidden">
+                    {/* Animated Background Gradient */}
+                    <motion.div
+                      className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                      initial={{ scale: 0.8, rotate: -45 }}
+                      whileHover={{ scale: 1.2, rotate: 0 }}
+                      transition={{ duration: 0.6 }}
+                    />
+
+                    {/* Shine Effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.6 }}
+                    />
+
+                    <div className="relative z-10">
+                      {/* Icon with Glow */}
+                      <motion.div
+                        className={`inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br ${service.gradient} rounded-2xl text-4xl mb-6 shadow-2xl relative`}
+                        whileHover={{
+                          rotate: [0, -10, 10, -10, 0],
+                          scale: 1.1,
+                        }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <motion.div
+                          className={`absolute inset-0 bg-gradient-to-br ${service.gradient} rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity`}
+                        />
+                        <span className="relative z-10">{service.icon}</span>
+                      </motion.div>
+
+                      <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-emerald-400 transition-colors">
+                        {service.name}
+                      </h3>
+
+                      <p className="text-gray-400 mb-6 leading-relaxed">
+                        {service.desc}
+                      </p>
+
+                      <motion.button
+                        className="flex items-center space-x-2 text-emerald-400 font-semibold group-hover:text-emerald-300 transition-colors"
+                        whileHover={{ x: 5 }}
+                        onClick={() => navigate("/services")}
+                      >
+                        <span>Learn More</span>
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          →
+                        </motion.span>
+                      </motion.button>
+                    </div>
+
+                    {/* Corner Decoration */}
+                    <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-emerald-500/10 to-transparent rounded-tl-3xl" />
+                  </div>
+
+                  {/* External Glow */}
+                  <div
+                    className={`absolute -inset-1 bg-gradient-to-r ${service.gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10`}
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <motion.div
+              className="mt-16 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+            >
+              <motion.button
+                className="group relative px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg shadow-2xl overflow-hidden"
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 60px rgba(16, 185, 129, 0.4)",
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-teal-600 to-emerald-500"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 flex items-center space-x-3">
+                  <span>View All Services</span>
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    →
+                  </motion.span>
+                </span>
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Portfolio Section */}
+        <section
+          id="portfolio"
+          className="py-32 bg-gradient-to-br from-gray-50 via-white to-emerald-50 relative overflow-hidden"
+        >
+          {/* Floating Background */}
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, rgba(0,0,0,0.2) 1px, transparent 1px)",
+                backgroundSize: "60px 60px",
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <motion.div
+              className="text-center mb-20"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                className="inline-block mb-4"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                transition={{ type: "spring", bounce: 0.5 }}
+              >
+                <span className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                  Our Work
+                </span>
+              </motion.div>
+
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-gray-900 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Portfolio Showcase
+                </span>
+              </h2>
+
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Explore some of our finest projects crafted with passion and
+                precision.
+              </p>
+            </motion.div>
+
+            {/* Projects Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {projects.slice(0, 3).map((project, idx) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.2, type: "spring", bounce: 0.4 }}
+                  whileHover={{ y: -12, scale: 1.02 }}
+                  className="group relative"
+                >
+                  <div className="relative bg-white rounded-3xl shadow-xl hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500">
+                    {/* Image */}
+                    <div className="relative h-56 overflow-hidden">
+                      <motion.img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.6 }}
+                      />
+
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-t ${project.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="text-2xl font-bold mb-2 text-gray-900 group-hover:text-emerald-600 transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="text-gray-600 mb-4 line-clamp-2">
+                        {project.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.techStack.map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-3 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+
+                      <motion.a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-600 font-semibold inline-flex items-center space-x-2 group-hover:text-emerald-700 transition-colors"
+                        whileHover={{ x: 5 }}
+                      >
+                        <span>View Project</span>
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          →
+                        </motion.span>
+                      </motion.a>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* View All Button */}
+            <motion.div
+              className="mt-16 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.button
+                className="group relative px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg shadow-2xl overflow-hidden"
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 60px rgba(16, 185, 129, 0.4)",
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/portfolio")}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-teal-600 to-emerald-500"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 flex items-center space-x-3">
+                  <span>View All Projects</span>
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    →
+                  </motion.span>
+                </span>
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        <FAQSection />
+        {/* Blog Section - Enhanced */}
+        <section
+          id="blog"
+          className="py-32 bg-gradient-to-br from-white via-emerald-50/30 to-white relative overflow-hidden"
+        >
+          {/* Background Decoration */}
+          <FloatingElement duration={15} amplitude={40}>
+            <div className="absolute top-20 right-10 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl" />
+          </FloatingElement>
+          <FloatingElement duration={12} amplitude={50}>
+            <div className="absolute bottom-20 left-10 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl" />
+          </FloatingElement>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <motion.div
+              className="text-center mb-20"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                className="inline-block mb-4"
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", bounce: 0.5 }}
+              >
+                <span className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                  Our Blog
+                </span>
+              </motion.div>
+
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-gray-900 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Latest Insights
+                </span>
+              </h2>
+
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Stay updated with the latest trends and insights from our
+                experts
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {blogs.map((post, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: idx * 0.15,
+                    type: "spring",
+                    bounce: 0.4,
+                  }}
+                  whileHover={{ y: -12, scale: 1.02 }}
+                  className="group relative"
+                >
+                  <div className="relative h-full bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-500 border border-gray-100">
+                    {/* Image Container */}
+                    <div className="relative h-56 overflow-hidden">
+                      <motion.img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.6 }}
+                      />
+
+                      {/* Gradient Overlay */}
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-t ${post.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+                      />
+
+                      {/* Category Badge */}
+                      <motion.div
+                        className={`absolute top-4 left-4 px-4 py-2 bg-gradient-to-r ${post.gradient} text-white rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm`}
+                        initial={{ scale: 0, rotate: -45 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        viewport={{ once: true }}
+                        transition={{
+                          delay: idx * 0.15 + 0.3,
+                          type: "spring",
+                        }}
+                      >
+                        {post.category}
+                      </motion.div>
+
+                      {/* Date Badge */}
+                      <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700">
+                        {post.date}
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="text-2xl font-bold mb-3 text-gray-900 group-hover:text-emerald-600 transition-colors">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-gray-600 mb-4 line-clamp-2">
+                        Discover the latest trends and innovations shaping the
+                        future of technology and business.
+                      </p>
+
+                      <motion.button
+                        className="flex items-center space-x-2 text-emerald-600 font-semibold group-hover:text-emerald-700 transition-colors"
+                        whileHover={{ x: 5 }}
+                      >
+                        <span>Read More</span>
+                        <motion.span
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          →
+                        </motion.span>
+                      </motion.button>
+                    </div>
+
+                    {/* Decorative Corner */}
+                    <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-emerald-100/50 to-transparent rounded-tl-3xl" />
+                  </div>
+
+                  {/* External Glow */}
+                  <div
+                    className={`absolute -inset-1 bg-gradient-to-r ${post.gradient} rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10`}
+                  />
+                </motion.div>
+              ))}
+            </div>
+
+            {/* View All Button */}
+            <motion.div
+              className="mt-16 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.button
+                className="group relative px-8 py-4 bg-white border-2 border-emerald-500 text-emerald-600 rounded-full font-semibold shadow-lg overflow-hidden"
+                whileHover={{
+                  scale: 1.05,
+                  y: -3,
+                  boxShadow: "0 20px 40px rgba(16, 185, 129, 0.2)",
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-emerald-50"
+                  initial={{ scale: 0, opacity: 0 }}
+                  whileHover={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>View All Articles</span>
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    →
+                  </motion.span>
+                </span>
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Contact Section - Enhanced */}
+        <section
+          id="contact"
+          className="py-32 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 relative overflow-hidden"
+        >
+          {/* Animated Background */}
+          <div className="absolute inset-0 opacity-20">
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, white 2px, transparent 2px)",
+                backgroundSize: "50px 50px",
+              }}
+              animate={{
+                backgroundPosition: ["0px 0px", "50px 50px", "0px 0px"],
+              }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+
+          {/* Floating Elements */}
+          {[...Array(10)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-3 h-3 bg-white/20 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -40, 0],
+                scale: [1, 1.5, 1],
+                opacity: [0.2, 0.8, 0.2],
+              }}
+              transition={{
+                duration: 4 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+
+          {/* Large Gradient Orbs */}
+          <FloatingElement duration={10} amplitude={50}>
+            <div className="absolute top-10 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+          </FloatingElement>
+          <FloatingElement duration={12} amplitude={60}>
+            <div className="absolute bottom-10 right-10 w-80 h-80 bg-teal-300/10 rounded-full blur-3xl" />
+          </FloatingElement>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <motion.div
+                  className="inline-block mb-6"
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", bounce: 0.5 }}
+                >
+                  <div className="px-5 py-2.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-full text-sm font-semibold">
+                    Get In Touch
+                  </div>
+                </motion.div>
+
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+                  Let's Build Something
+                  <br />
+                  <span className="bg-gradient-to-r from-yellow-200 to-white bg-clip-text text-transparent">
+                    Amazing Together
+                  </span>
+                </h2>
+
+                <p className="text-xl text-white/95 mb-12 max-w-2xl mx-auto">
+                  Get in touch and let's create the future with innovative
+                  solutions tailored to your needs
+                </p>
+
+                <motion.div
+                  className="flex flex-wrap justify-center gap-4 mb-16"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.button
+                    className="group relative px-10 py-5 bg-white text-emerald-600 rounded-full font-bold text-lg shadow-2xl overflow-hidden"
+                    whileHover={{
+                      scale: 1.05,
+                      y: -3,
+                      boxShadow: "0 25px 50px rgba(255, 255, 255, 0.3)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-emerald-50 to-teal-50"
+                      initial={{ scale: 0 }}
+                      whileHover={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <span>Start a Project</span>
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        🚀
+                      </motion.span>
+                    </span>
+                  </motion.button>
+
+                  <motion.button
+                    className="group relative px-10 py-5 border-2 border-white/80 text-white rounded-full font-bold text-lg backdrop-blur-sm overflow-hidden"
+                    whileHover={{
+                      scale: 1.05,
+                      y: -3,
+                      backgroundColor: "rgba(255, 255, 255, 0.15)",
+                      borderColor: "rgba(255, 255, 255, 1)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <span>Contact Us</span>
+                      <motion.span
+                        animate={{ rotate: [0, 15, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        💬
+                      </motion.span>
+                    </span>
+                  </motion.button>
+                </motion.div>
+
+                {/* Contact Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {contact.map((contact, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.4 + idx * 0.1 }}
+                      whileHover={{ y: -8, scale: 1.05 }}
+                      className="group relative"
+                    >
+                      <div className="relative h-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-500 overflow-hidden">
+                        {/* Shine Effect */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: "100%" }}
+                          transition={{ duration: 0.6 }}
+                        />
+
+                        <div className="relative z-10">
+                          {/* Icon */}
+                          <motion.div
+                            className={`w-16 h-16 bg-gradient-to-br ${contact.gradient} rounded-2xl flex items-center justify-center text-3xl mb-4 mx-auto shadow-xl`}
+                            whileHover={{
+                              rotate: [0, -10, 10, -10, 0],
+                              scale: 1.1,
+                            }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            {contact.icon}
+                          </motion.div>
+
+                          <p className="text-sm text-white/80 mb-1 font-medium">
+                            {contact.label}
+                          </p>
+                          <p className="text-lg font-bold text-white">
+                            {contact.value}
+                          </p>
+                        </div>
+
+                        {/* Decorative Corner */}
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-bl-2xl" />
+                      </div>
+
+                      {/* Glow Effect */}
+                      <div
+                        className={`absolute -inset-1 bg-gradient-to-r ${contact.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10`}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Social Proof */}
+                <motion.div
+                  className="mt-16 flex flex-wrap justify-center items-center gap-8 text-white/90"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <div className="flex items-center space-x-2">
+                    <motion.div
+                      className="w-2 h-2 bg-green-400 rounded-full"
+                      animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <span className="text-sm font-medium">Available 24/7</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-bold">50+</span> Projects Delivered
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-bold">99%</span> Client Satisfaction
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="text-yellow-400"
+                        initial={{ opacity: 0, scale: 0 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.8 + i * 0.1 }}
+                      >
+                        ⭐
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer - Enhanced */}
+        <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-16 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+              {/* Brand Column */}
+              <div className="md:col-span-2">
+                <motion.div
+                  className="flex items-center space-x-3 mb-6"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-xl">C</span>
+                  </div>
+                  <span className="text-3xl font-bold">Celsystech</span>
+                </motion.div>
+                <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
+                  Transforming ideas into impactful digital solutions. Your
+                  trusted partner in web development, mobile apps, and
+                  cutting-edge technology.
+                </p>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h4 className="text-lg font-bold mb-4">Quick Links</h4>
+                <ul className="space-y-2">
+                  {["About Us", "Services", "Portfolio", "Blog", "Contact"].map(
+                    (link, idx) => (
+                      <motion.li
+                        key={link}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <a
+                          href={`#${link.toLowerCase().replace(" ", "")}`}
+                          className="text-gray-400 hover:text-emerald-400 transition-colors inline-flex items-center group"
+                        >
+                          <motion.span
+                            className="mr-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            initial={{ x: -10 }}
+                            whileHover={{ x: 0 }}
+                          >
+                            →
+                          </motion.span>
+                          {link}
+                        </a>
+                      </motion.li>
+                    )
+                  )}
+                </ul>
+              </div>
+
+              {/* Newsletter */}
+              <div>
+                <h4 className="text-lg font-bold mb-4">Stay Updated</h4>
+                <p className="text-gray-400 text-sm mb-4">
+                  Subscribe to our newsletter for latest updates
+                </p>
+                <motion.div
+                  className="flex"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <input
+                    type="email"
+                    placeholder="Your email"
+                    className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                  <motion.button
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-r-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    →
+                  </motion.button>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <motion.div
+              className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+            >
+              <p className="text-gray-400 text-sm">
+                © 2024 Celsystech. All rights reserved. Crafted with{" "}
+                <motion.span
+                  className="text-red-500 inline-block"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  ❤️
+                </motion.span>{" "}
+                in India
+              </p>
+              <div className="flex space-x-6 text-sm text-gray-400">
+                {["Privacy Policy", "Terms of Service", "Cookies"].map(
+                  (item) => (
+                    <motion.a
+                      key={item}
+                      href="#"
+                      className="hover:text-emerald-400 transition-colors"
+                      whileHover={{ y: -2 }}
+                    >
+                      {item}
+                    </motion.a>
+                  )
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </footer>
+
+        {/* Scroll to Top Button */}
+        <motion.button
+          className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{
+            scale: 1.1,
+            boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
+          }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          <motion.span
+            animate={{ y: [-2, 2, -2] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            ↑
+          </motion.span>
+        </motion.button>
       </motion.div>
     </>
   );
 };
 
-export default Home;
+export default App;

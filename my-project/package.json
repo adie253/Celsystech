@@ -10,14 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.0",
-    "framer-motion": "^12.3.1",
+    "@tailwindcss/vite": "^4.1.14",
+    "framer-motion": "^12.23.24",
     "gsap": "^3.12.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^5.0.0",
     "react-helmet": "^6.1.0",
     "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^7.9.5",
     "react-scroll": "^1.9.0",
     "typewriter-effect": "^2.21.0"
   },
