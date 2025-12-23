@@ -1,0 +1,44 @@
+[
+    {
+        "icon": "🌐",
+        "name": "Web Development",
+        "desc": "Modern, responsive, and scalable web apps",
+        "gradient": "from-blue-500 to-teal-500",
+        "delay": 0
+    },
+    {
+        "icon": "📱",
+        "name": "App Development",
+        "desc": "Seamless iOS & Android experiences",
+        "gradient": "from-purple-500 to-indigo-500",
+        "delay": 0.1
+    },
+    {
+        "icon": "🔍",
+        "name": "SEO Optimization",
+        "desc": "Rank higher & reach your target audience",
+        "gradient": "from-green-500 to-emerald-600",
+        "delay": 0.2
+    },
+    {
+        "icon": "🤖",
+        "name": "AI & ML Solutions",
+        "desc": "Intelligent automation and data-driven insights",
+        "gradient": "from-indigo-500 to-violet-600",
+        "delay": 0.3
+    },
+    {
+        "icon": "📊",
+        "name": "Data Analytics",
+        "desc": "Visualize, analyze & make smarter decisions",
+        "gradient": "from-cyan-500 to-blue-500",
+        "delay": 0.4
+    },
+    {
+        "icon": "⚙️",
+        "name": "Business Automation",
+        "desc": "Streamline workflows with smart systems",
+        "gradient": "from-orange-500 to-amber-600",
+        "delay": 0.5
+    }
+]

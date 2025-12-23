@@ -4,7 +4,18 @@ import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import FloatingElement from "./ui/FloatingElement";
 import AnimatedCounter from "./ui/AnimatedCounter";
-import { blogs, contact, projects, services, stats, tagLines } from "./ui/Data";
+import blogs from "../data/blogs.json";
+import contact from "../data/contact.json";
+import projects from "../data/projects.json";
+import services from "../data/services.json";
+import stats from "../data/stats.json";
+import tagLines from "../data/taglines.json";
+
+/**
+ * Home Component
+ * Landing page of the application containing various sections like Hero, Stats, About, Services, Portfolio, Blog, and Contact.
+ * Uses Framer Motion for animations.
+ */
 import FAQSection from "./ui/FaqPage";
 import { useState } from "react";
 import SimpleContactForm from "./ContactPage";

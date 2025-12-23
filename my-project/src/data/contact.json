@@ -1,0 +1,20 @@
+[
+    {
+        "icon": "📧",
+        "label": "Email Us",
+        "value": "contact@celsystech.com",
+        "gradient": "from-blue-400 to-blue-600"
+    },
+    {
+        "icon": "📱",
+        "label": "Call Us",
+        "value": "+91 12345 67890",
+        "gradient": "from-purple-400 to-purple-600"
+    },
+    {
+        "icon": "📍",
+        "label": "Visit Us",
+        "value": "Pune, Maharashtra",
+        "gradient": "from-pink-400 to-pink-600"
+    }
+]

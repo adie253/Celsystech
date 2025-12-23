@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+/**
+ * SimpleContactForm Component
+ * A contact form with validation and success state handling.
+ * fields: Name, Email, Phone, Company.
+ */
 const SimpleContactForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -150,11 +155,10 @@ const SimpleContactForm = () => {
                 value={formData.name}
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
-                  errors.name
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${errors.name
                     ? "border-red-500 focus:border-red-500"
                     : "border-gray-200 focus:border-emerald-500"
-                }`}
+                  }`}
                 placeholder="John Doe"
               />
               {errors.name && (
@@ -198,11 +202,10 @@ const SimpleContactForm = () => {
                 value={formData.email}
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
-                  errors.email
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${errors.email
                     ? "border-red-500 focus:border-red-500"
                     : "border-gray-200 focus:border-emerald-500"
-                }`}
+                  }`}
                 placeholder="john@example.com"
               />
               {errors.email && (
@@ -225,11 +228,10 @@ const SimpleContactForm = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 onKeyPress={handleKeyPress}
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
-                  errors.phone
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${errors.phone
                     ? "border-red-500 focus:border-red-500"
                     : "border-gray-200 focus:border-emerald-500"
-                }`}
+                  }`}
                 placeholder="+1 (555) 000-0000"
               />
               {errors.phone && (
@@ -241,11 +243,10 @@ const SimpleContactForm = () => {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                isSubmitting
+              className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${isSubmitting
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-lg"
-              }`}
+                }`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
