@@ -1,26 +1,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import FloatingElement from "./ui/FloatingElement";
+import quoteOptions from "../data/quote_options.json";
 
-const FloatingElement = ({
-  children,
-  duration = 5,
-  amplitude = 20,
-  delay = 0,
-}) => (
-  <motion.div
-    animate={{
-      y: [0, -amplitude, 0],
-    }}
-    transition={{
-      duration,
-      repeat: Infinity,
-      ease: "easeInOut",
-      delay,
-    }}
-  >
-    {children}
-  </motion.div>
-);
+/**
+ * GetQuote Component
+ * Multi-step form for users to request a quote.
+ * @returns {JSX.Element}
+ */
 
 const GetQuote = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,94 +25,7 @@ const GetQuote = () => {
   });
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const services = [
-    {
-      id: "web",
-      name: "Web Development",
-      icon: "🌐",
-      gradient: "from-blue-400 to-blue-600",
-    },
-    {
-      id: "mobile",
-      name: "Mobile App",
-      icon: "📱",
-      gradient: "from-purple-400 to-purple-600",
-    },
-    {
-      id: "uiux",
-      name: "UI/UX Design",
-      icon: "🎨",
-      gradient: "from-pink-400 to-pink-600",
-    },
-    {
-      id: "ecommerce",
-      name: "E-Commerce",
-      icon: "🛒",
-      gradient: "from-orange-400 to-orange-600",
-    },
-    {
-      id: "blockchain",
-      name: "Blockchain",
-      icon: "⛓️",
-      gradient: "from-emerald-400 to-emerald-600",
-    },
-    {
-      id: "marketing",
-      name: "Digital Marketing",
-      icon: "📊",
-      gradient: "from-teal-400 to-teal-600",
-    },
-  ];
-
-  const projectTypes = [
-    { id: "new", name: "New Project", icon: "✨", desc: "Start from scratch" },
-    {
-      id: "redesign",
-      name: "Redesign",
-      icon: "🔄",
-      desc: "Modernize existing",
-    },
-    {
-      id: "maintenance",
-      name: "Maintenance",
-      icon: "🛠️",
-      desc: "Support & updates",
-    },
-    {
-      id: "consulting",
-      name: "Consulting",
-      icon: "💡",
-      desc: "Expert guidance",
-    },
-  ];
-
-  const budgetRanges = [
-    { id: "small", range: "$1K - $5K", icon: "💵" },
-    { id: "medium", range: "$5K - $15K", icon: "💰" },
-    { id: "large", range: "$15K - $50K", icon: "💎" },
-    { id: "enterprise", range: "$50K+", icon: "🏆" },
-  ];
-
-  const timelines = [
-    { id: "urgent", name: "ASAP (1-2 weeks)", icon: "⚡" },
-    { id: "normal", name: "Normal (1-2 months)", icon: "📅" },
-    { id: "flexible", name: "Flexible (3+ months)", icon: "🗓️" },
-  ];
-
-  const features = [
-    "Responsive Design",
-    "API Integration",
-    "Database Design",
-    "Payment Gateway",
-    "Admin Dashboard",
-    "User Authentication",
-    "Analytics",
-    "Cloud Hosting",
-    "SEO Optimization",
-    "Security Features",
-    "Third-party Integration",
-    "Mobile App",
-  ];
+  const { services, projectTypes, budgetRanges, timelines, features } = quoteOptions;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -260,11 +160,10 @@ const GetQuote = () => {
                 {[1, 2, 3, 4].map((step) => (
                   <div key={step} className="flex items-center flex-1">
                     <motion.div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-500 ${
-                        currentStep >= step
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-500 ${currentStep >= step
                           ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
                           : "bg-gray-200 text-gray-500"
-                      }`}
+                        }`}
                       whileHover={{ scale: 1.1 }}
                       animate={
                         currentStep === step ? { scale: [1, 1.1, 1] } : {}
@@ -278,11 +177,10 @@ const GetQuote = () => {
                     </motion.div>
                     {step < 4 && (
                       <div
-                        className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${
-                          currentStep > step
+                        className={`flex-1 h-1 mx-2 rounded-full transition-all duration-500 ${currentStep > step
                             ? "bg-gradient-to-r from-emerald-500 to-teal-600"
                             : "bg-gray-200"
-                        }`}
+                          }`}
                       />
                     )}
                   </div>
@@ -347,11 +245,10 @@ const GetQuote = () => {
                                 serviceType: service.id,
                               })
                             }
-                            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
-                              formData.serviceType === service.id
+                            className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${formData.serviceType === service.id
                                 ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg"
                                 : "border-gray-200 bg-white hover:border-emerald-300 hover:shadow-md"
-                            }`}
+                              }`}
                           >
                             <motion.div
                               className={`text-4xl mb-3 inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${service.gradient} rounded-xl shadow-lg`}
@@ -415,11 +312,10 @@ const GetQuote = () => {
                                   projectType: type.id,
                                 })
                               }
-                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
-                                formData.projectType === type.id
+                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${formData.projectType === type.id
                                   ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg"
                                   : "border-gray-200 bg-white hover:border-emerald-300"
-                              }`}
+                                }`}
                             >
                               <div className="text-3xl mb-2">{type.icon}</div>
                               <h4 className="font-bold text-gray-900 mb-1">
@@ -460,11 +356,10 @@ const GetQuote = () => {
                               onClick={() =>
                                 setFormData({ ...formData, budget: budget.id })
                               }
-                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
-                                formData.budget === budget.id
+                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${formData.budget === budget.id
                                   ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg"
                                   : "border-gray-200 bg-white hover:border-emerald-300"
-                              }`}
+                                }`}
                             >
                               <div className="text-3xl mb-2">{budget.icon}</div>
                               <h4 className="font-bold text-gray-900">
@@ -523,11 +418,10 @@ const GetQuote = () => {
                                   timeline: timeline.id,
                                 })
                               }
-                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
-                                formData.timeline === timeline.id
+                              className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${formData.timeline === timeline.id
                                   ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg"
                                   : "border-gray-200 bg-white hover:border-emerald-300"
-                              }`}
+                                }`}
                             >
                               <div className="text-3xl mb-2">
                                 {timeline.icon}
@@ -582,11 +476,10 @@ const GetQuote = () => {
                                     });
                                   }
                                 }}
-                                className={`p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-300 ${
-                                  isSelected
+                                className={`p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-300 ${isSelected
                                     ? "border-emerald-500 bg-emerald-500 text-white shadow-md"
                                     : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
-                                }`}
+                                  }`}
                               >
                                 {feature}
                               </motion.button>
@@ -757,11 +650,10 @@ const GetQuote = () => {
                       disabled={!isStepValid()}
                       whileHover={isStepValid() ? { x: 5, scale: 1.05 } : {}}
                       whileTap={isStepValid() ? { scale: 0.95 } : {}}
-                      className={`px-8 py-3 rounded-full font-bold transition-all ${
-                        isStepValid()
+                      className={`px-8 py-3 rounded-full font-bold transition-all ${isStepValid()
                           ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg hover:shadow-xl"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      }`}
+                        }`}
                     >
                       Next Step →
                     </motion.button>
@@ -772,17 +664,16 @@ const GetQuote = () => {
                       whileHover={
                         isStepValid()
                           ? {
-                              scale: 1.05,
-                              boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
-                            }
+                            scale: 1.05,
+                            boxShadow: "0 20px 40px rgba(16, 185, 129, 0.4)",
+                          }
                           : {}
                       }
                       whileTap={isStepValid() ? { scale: 0.95 } : {}}
-                      className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${
-                        isStepValid()
+                      className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${isStepValid()
                           ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg"
                           : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      }`}
+                        }`}
                     >
                       Submit Quote Request 🚀
                     </motion.button>

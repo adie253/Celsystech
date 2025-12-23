@@ -1,5 +1,10 @@
 import { motion } from "framer-motion";
-import { projects } from "./ui/Data";
+import projects from "../data/projects.json";
+
+/**
+ * PortfolioPage Component
+ * Displays a grid of projects with details.
+ */
 
 const PortfolioPage = () => {
   return (
