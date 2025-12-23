@@ -103,7 +103,7 @@ const App = () => {
                   </div>
                 </motion.div>
 
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-[1.1]">
+                <h1 className="text-5xl sm:text-6xl lg:text-6xl font-bold mb-8 leading-[1.1]">
                   <motion.span
                     className="block bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
                     initial={{ opacity: 0, y: 20 }}
