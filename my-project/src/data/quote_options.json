@@ -1,0 +1,119 @@
+{
+    "services": [
+        {
+            "id": "web",
+            "name": "Web Development",
+            "icon": "🌐",
+            "gradient": "from-blue-400 to-blue-600"
+        },
+        {
+            "id": "mobile",
+            "name": "Mobile App",
+            "icon": "📱",
+            "gradient": "from-purple-400 to-purple-600"
+        },
+        {
+            "id": "uiux",
+            "name": "UI/UX Design",
+            "icon": "🎨",
+            "gradient": "from-pink-400 to-pink-600"
+        },
+        {
+            "id": "ecommerce",
+            "name": "E-Commerce",
+            "icon": "🛒",
+            "gradient": "from-orange-400 to-orange-600"
+        },
+        {
+            "id": "blockchain",
+            "name": "Blockchain",
+            "icon": "⛓️",
+            "gradient": "from-emerald-400 to-emerald-600"
+        },
+        {
+            "id": "marketing",
+            "name": "Digital Marketing",
+            "icon": "📊",
+            "gradient": "from-teal-400 to-teal-600"
+        }
+    ],
+    "projectTypes": [
+        {
+            "id": "new",
+            "name": "New Project",
+            "icon": "✨",
+            "desc": "Start from scratch"
+        },
+        {
+            "id": "redesign",
+            "name": "Redesign",
+            "icon": "🔄",
+            "desc": "Modernize existing"
+        },
+        {
+            "id": "maintenance",
+            "name": "Maintenance",
+            "icon": "🛠️",
+            "desc": "Support & updates"
+        },
+        {
+            "id": "consulting",
+            "name": "Consulting",
+            "icon": "💡",
+            "desc": "Expert guidance"
+        }
+    ],
+    "budgetRanges": [
+        {
+            "id": "small",
+            "range": "$1K - $5K",
+            "icon": "💵"
+        },
+        {
+            "id": "medium",
+            "range": "$5K - $15K",
+            "icon": "💰"
+        },
+        {
+            "id": "large",
+            "range": "$15K - $50K",
+            "icon": "💎"
+        },
+        {
+            "id": "enterprise",
+            "range": "$50K+",
+            "icon": "🏆"
+        }
+    ],
+    "timelines": [
+        {
+            "id": "urgent",
+            "name": "ASAP (1-2 weeks)",
+            "icon": "⚡"
+        },
+        {
+            "id": "normal",
+            "name": "Normal (1-2 months)",
+            "icon": "📅"
+        },
+        {
+            "id": "flexible",
+            "name": "Flexible (3+ months)",
+            "icon": "🗓️"
+        }
+    ],
+    "features": [
+        "Responsive Design",
+        "API Integration",
+        "Database Design",
+        "Payment Gateway",
+        "Admin Dashboard",
+        "User Authentication",
+        "Analytics",
+        "Cloud Hosting",
+        "SEO Optimization",
+        "Security Features",
+        "Third-party Integration",
+        "Mobile App"
+    ]
+}

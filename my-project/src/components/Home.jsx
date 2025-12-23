@@ -4,7 +4,18 @@ import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import FloatingElement from "./ui/FloatingElement";
 import AnimatedCounter from "./ui/AnimatedCounter";
-import { blogs, contact, projects, services, stats, tagLines } from "./ui/Data";
+import blogs from "../data/blogs.json";
+import contact from "../data/contact.json";
+import projects from "../data/projects.json";
+import services from "../data/services.json";
+import stats from "../data/stats.json";
+import tagLines from "../data/taglines.json";
+
+/**
+ * Home Component
+ * Landing page of the application containing various sections like Hero, Stats, About, Services, Portfolio, Blog, and Contact.
+ * Uses Framer Motion for animations.
+ */
 import FAQSection from "./ui/FaqPage";
 import { useState } from "react";
 import SimpleContactForm from "./ContactPage";
@@ -65,7 +76,7 @@ const App = () => {
           </div>
 
           <div className="container mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center lg:p-10 lg:pt-0"> {/* --------------------------------------------------------------------------------------left block of text - hero section */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -306,12 +317,12 @@ const App = () => {
                     </motion.div> */}
 
                   {/* Main Image */}
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                  <div className="relative rounded-3xl overflow-hidden shadow-2xl m-5 ">
                     <motion.div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <img
                       src={itConsultancyHero}
                       alt="Professional IT consultancy services with technology experts collaborating"
-                      className="w-full h-auto relative z-0 transform group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-auto relative z-0 transform group-hover:scale-105 transition-transform duration-700 "
                     />
                   </div>
 

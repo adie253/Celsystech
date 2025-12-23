@@ -1,0 +1,23 @@
+[
+  {
+    "number": "50+",
+    "label": "Projects Completed",
+    "icon": "🎯",
+    "color": "from-yellow-400 to-orange-400",
+    "desc": "From small startups to large enterprises, delivering excellence every time."
+  },
+  {
+    "number": "99%",
+    "label": "Client Satisfaction",
+    "icon": "⭐",
+    "color": "from-blue-400 to-purple-400",
+    "desc": "Trusted by clients worldwide for quality, reliability, and communication."
+  },
+  {
+    "number": "24/7",
+    "label": "Support Available",
+    "icon": "💬",
+    "color": "from-pink-400 to-red-400",
+    "desc": "Always ready to help you with quick responses and reliable assistance."
+  }
+]

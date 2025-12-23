@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "title": "Ajeenkya DY Patil - Research Paper Publication Web Application",
+        "description": "An intertactive website which allows publication of reasearch paper of students",
+        "image": "https://res.cloudinary.com/dbp9kern3/image/upload/v1763358832/adypjiet_l4olcn.png",
+        "techStack": [
+            "React js",
+            "Node.js",
+            "Express.js",
+            "Tailwind CSS",
+            "PostgreSQL",
+            "MongoDB"
+        ],
+        "link": "https://adypsoe.in/adypjiet/index_old.html",
+        "gradient": "from-indigo-500 to-blue-600"
+    },
+    {
+        "id": 2,
+        "title": "Flowchart Maker Web Application - Node Manager",
+        "description": "A modern, scalable online flowchart designer helps in designing the LLM structure",
+        "image": "https://res.cloudinary.com/dbp9kern3/image/upload/v1763359216/flowchart_i47d7c.png",
+        "techStack": [
+            "Next.js",
+            "React flow",
+            "Tailwind CSS",
+            "Material UI"
+        ],
+        "link": "https://node-manager-flowchart-desginer.vercel.app/",
+        "gradient": "from-emerald-500 to-teal-600"
+    },
+    {
+        "id": 3,
+        "title": "Premium Pastery Shop",
+        "description": "Premium website for showcase of pastery for sale",
+        "image": "https://res.cloudinary.com/dbp9kern3/image/upload/v1763360058/pastery_dmirpj.png",
+        "techStack": [
+            "Next.js",
+            "React flow",
+            "Tailwind CSS",
+            "Material UI"
+        ],
+        "link": "https://pastery-shop-ui-qmvu.vercel.app/",
+        "gradient": "from-orange-500 to-amber-600"
+    }
+]

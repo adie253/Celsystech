@@ -1,27 +1,12 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { services2 } from "./Data";
+import FloatingElement from "./FloatingElement";
+import services2 from "../../data/services_detailed.json";
 
-const FloatingElement = ({
-  children,
-  duration = 5,
-  amplitude = 20,
-  delay = 0,
-}) => (
-  <motion.div
-    animate={{
-      y: [0, -amplitude, 0],
-    }}
-    transition={{
-      duration,
-      repeat: Infinity,
-      ease: "easeInOut",
-      delay,
-    }}
-  >
-    {children}
-  </motion.div>
-);
+/**
+ * LearnMore Component
+ * Detailed services page with modal view for each service.
+ */
 
 const LearnMore = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -270,11 +255,10 @@ const LearnMore = () => {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-6 py-3 font-semibold capitalize transition-colors relative ${
-                        activeTab === tab
+                      className={`px-6 py-3 font-semibold capitalize transition-colors relative ${activeTab === tab
                           ? "text-emerald-600"
                           : "text-gray-500 hover:text-gray-700"
-                      }`}
+                        }`}
                     >
                       {tab}
                       {activeTab === tab && (
