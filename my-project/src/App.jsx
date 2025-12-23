@@ -10,6 +10,11 @@ import PortfolioPage from "./components/PortfolioPage";
 import GetQuote from "./components/Get_Quote";
 import SimpleContactForm from "./components/ContactPage";
 
+/**
+ * App Component
+ * Root component handling routing and splash screen logic.
+ * Manages session persistence for splash screen to show only once.
+ */
 const App = () => {
   // ✅ Splash state with session persistence
   const [showSplash, setShowSplash] = useState(() => {

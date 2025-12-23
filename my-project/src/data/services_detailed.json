@@ -1,0 +1,241 @@
+[
+    {
+        "id": 1,
+        "name": "Web Development",
+        "icon": "🌐",
+        "gradient": "from-blue-400 to-blue-600",
+        "tagline": "Crafting Digital Experiences",
+        "description": "Transform your vision into high-performance, scalable web applications that engage and convert users seamlessly.",
+        "features": [
+            {
+                "icon": "⚡",
+                "title": "Lightning Fast",
+                "desc": "Optimized for speed and SEO"
+            },
+            {
+                "icon": "📱",
+                "title": "Fully Responsive",
+                "desc": "Perfect on every device"
+            },
+            {
+                "icon": "🎨",
+                "title": "Modern Design",
+                "desc": "Elegant and user-focused UI/UX"
+            },
+            {
+                "icon": "🔒",
+                "title": "Secure & Reliable",
+                "desc": "Strong security and uptime"
+            }
+        ],
+        "technologies": [
+            "React",
+            "Next.js",
+            "Node.js",
+            "TypeScript",
+            "Tailwind CSS"
+        ],
+        "pricing": "Starting at $2,999",
+        "deliveryTime": "3-5 weeks",
+        "image": "https://img.freepik.com/free-vector/web-development-programmer-engineering-coding-website-augmented-reality-interface-screens-developer-project-engineer-programming-software-application-design-cartoon-illustration_107791-3863.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Mobile App Development",
+        "icon": "📱",
+        "gradient": "from-purple-400 to-purple-600",
+        "tagline": "Seamless Experiences on iOS & Android",
+        "description": "We build sleek, high-performance mobile apps for iOS and Android that delight users and deliver real results.",
+        "features": [
+            {
+                "icon": "🎯",
+                "title": "Cross-Platform",
+                "desc": "iOS & Android compatibility"
+            },
+            {
+                "icon": "💎",
+                "title": "Native Feel",
+                "desc": "Smooth animations & UI"
+            },
+            {
+                "icon": "🔔",
+                "title": "Real-Time Features",
+                "desc": "Notifications & updates"
+            },
+            {
+                "icon": "🧩",
+                "title": "API Integration",
+                "desc": "Connects seamlessly with backend"
+            }
+        ],
+        "technologies": [
+            "React Native",
+            "Swift",
+            "Kotlin",
+            "Firebase",
+            "Expo"
+        ],
+        "pricing": "Starting at $4,499",
+        "deliveryTime": "4-8 weeks",
+        "image": "https://img.freepik.com/free-vector/app-development-concept-illustration_114360-5164.jpg"
+    },
+    {
+        "id": 3,
+        "name": "SEO Optimization",
+        "icon": "🔍",
+        "gradient": "from-green-400 to-emerald-600",
+        "tagline": "Rank Higher, Reach Further",
+        "description": "Boost your online visibility and traffic with proven SEO strategies, performance audits, and content optimization.",
+        "features": [
+            {
+                "icon": "📈",
+                "title": "Keyword Research",
+                "desc": "Targeted and data-driven"
+            },
+            {
+                "icon": "⚙️",
+                "title": "Technical SEO",
+                "desc": "Faster indexing and structure"
+            },
+            {
+                "icon": "📝",
+                "title": "Content Optimization",
+                "desc": "Engaging SEO content"
+            },
+            {
+                "icon": "🔗",
+                "title": "Backlink Strategy",
+                "desc": "Quality authority links"
+            }
+        ],
+        "technologies": [
+            "Google Analytics",
+            "SEMrush",
+            "Ahrefs",
+            "Screaming Frog"
+        ],
+        "pricing": "Starting at $1,499/mo",
+        "deliveryTime": "Ongoing",
+        "image": "https://img.freepik.com/free-vector/seo-analytics-concept-illustration_114360-9249.jpg"
+    },
+    {
+        "id": 4,
+        "name": "AI & ML Solutions",
+        "icon": "🤖",
+        "gradient": "from-indigo-400 to-indigo-600",
+        "tagline": "Smarter Decisions with Data",
+        "description": "Empower your business with artificial intelligence and machine learning models that predict, automate, and optimize.",
+        "features": [
+            {
+                "icon": "🧠",
+                "title": "Custom AI Models",
+                "desc": "Tailored to your business needs"
+            },
+            {
+                "icon": "📊",
+                "title": "Predictive Analytics",
+                "desc": "Forecast trends with precision"
+            },
+            {
+                "icon": "🤝",
+                "title": "Integration Ready",
+                "desc": "Easily connect with your systems"
+            },
+            {
+                "icon": "⚙️",
+                "title": "Automation",
+                "desc": "Save time and resources"
+            }
+        ],
+        "technologies": [
+            "Python",
+            "TensorFlow",
+            "PyTorch",
+            "OpenAI",
+            "scikit-learn"
+        ],
+        "pricing": "Starting at $5,999",
+        "deliveryTime": "6-10 weeks",
+        "image": "https://img.freepik.com/free-vector/ai-machine-learning-concept-illustration_114360-5921.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Data Analytics",
+        "icon": "📊",
+        "gradient": "from-cyan-400 to-cyan-600",
+        "tagline": "Turn Data Into Insights",
+        "description": "Unlock actionable insights with advanced analytics dashboards, visualization tools, and performance tracking.",
+        "features": [
+            {
+                "icon": "📈",
+                "title": "Data Visualization",
+                "desc": "Interactive dashboards"
+            },
+            {
+                "icon": "📂",
+                "title": "Data Warehousing",
+                "desc": "Centralized, scalable storage"
+            },
+            {
+                "icon": "🔍",
+                "title": "Trend Analysis",
+                "desc": "Identify growth opportunities"
+            },
+            {
+                "icon": "📑",
+                "title": "Custom Reports",
+                "desc": "Clear insights for decisions"
+            }
+        ],
+        "technologies": [
+            "Power BI",
+            "Tableau",
+            "Python",
+            "SQL",
+            "Google Data Studio"
+        ],
+        "pricing": "Starting at $3,499",
+        "deliveryTime": "3-6 weeks",
+        "image": "https://img.freepik.com/free-vector/data-analytics-concept-illustration_114360-864.jpg"
+    },
+    {
+        "id": 6,
+        "name": "Business Insights & Automation",
+        "icon": "⚙️",
+        "gradient": "from-orange-400 to-orange-600",
+        "tagline": "Automate, Analyze, Accelerate",
+        "description": "Streamline workflows and empower smarter decisions with business process automation and performance analytics.",
+        "features": [
+            {
+                "icon": "⚡",
+                "title": "Workflow Automation",
+                "desc": "Save time & resources"
+            },
+            {
+                "icon": "📉",
+                "title": "Process Optimization",
+                "desc": "Eliminate inefficiencies"
+            },
+            {
+                "icon": "🧩",
+                "title": "System Integration",
+                "desc": "Unify your tools & data"
+            },
+            {
+                "icon": "📊",
+                "title": "Performance Tracking",
+                "desc": "Real-time business health"
+            }
+        ],
+        "technologies": [
+            "Zapier",
+            "n8n",
+            "Power Automate",
+            "Airtable",
+            "Google Apps Script"
+        ],
+        "pricing": "Starting at $2,999",
+        "deliveryTime": "2-5 weeks",
+        "image": "https://img.freepik.com/free-vector/robot-analyzing-data-illustration_114360-5323.jpg"
+    }
+]

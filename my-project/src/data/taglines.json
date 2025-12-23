@@ -1,0 +1,41 @@
+[
+    {
+        "title": "Transform Your Business with",
+        "highlight": "Advanced Tech!",
+        "subtitle": "Empowering growth through innovation.",
+        "desc": "Our specialists provide cutting-edge solutions built for scalability and performance. We help you integrate the right technology to stay ahead in today’s fast-changing digital landscape.",
+        "bullets": [
+            "Custom software & automation solutions",
+            "Scalable cloud integrations",
+            "Modern web & mobile experiences"
+        ],
+        "icon": "🚀",
+        "gradient": "from-emerald-400 to-teal-500"
+    },
+    {
+        "title": "Harness the Power of",
+        "highlight": "Smart Technology!",
+        "subtitle": "Where intelligence meets simplicity.",
+        "desc": "Leverage our advanced tools and analytics to streamline operations and maximize efficiency. Our team ensures your business makes data-driven, future-ready decisions.",
+        "bullets": [
+            "AI-powered process optimization",
+            "Data visualization & insights",
+            "Workflow automation platforms"
+        ],
+        "icon": "⚡",
+        "gradient": "from-blue-400 to-purple-500"
+    },
+    {
+        "title": "Unlock New Possibilities with",
+        "highlight": "Dedicated Team",
+        "subtitle": "Your success is our mission.",
+        "desc": "Partner with our experienced experts committed to turning your vision into reality. We deliver unmatched dedication, communication, and creativity throughout every project.",
+        "bullets": [
+            "Agile & transparent collaboration",
+            "24/7 project support",
+            "Creative solutions tailored to goals"
+        ],
+        "icon": "💡",
+        "gradient": "from-pink-400 to-red-500"
+    }
+]
